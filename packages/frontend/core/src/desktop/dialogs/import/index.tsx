@@ -74,22 +74,22 @@ type FolderHierarchy = {
 };
 
 // Helper function to create folder structure using OrganizeService
-function createFolderStructure(
+async function createFolderStructure(
   organizeService: OrganizeService,
   hierarchy: FolderHierarchy,
   parentFolderId: string | null = null,
   explorerIconService?: ExplorerIconService
-): {
+): Promise<{
   folderId: string | null;
   docLinks: Array<{ folderId: string; docId: string }>;
-} {
+}> {
   const docLinks: Array<{ folderId: string; docId: string }> = [];
   const rootFolder = organizeService.folderTree.rootFolder;
 
-  function processHierarchyNode(
+  const processHierarchyNode = async (
     node: FolderHierarchy,
     currentParentId: string | null
-  ): string | null {
+  ): Promise<string | null> => {
     let currentFolderId = currentParentId;
 
     // If this node represents a folder (has children but no pageId), create it
@@ -100,7 +100,7 @@ function createFolderStructure(
 
       if (parent) {
         const index = parent.indexAt('after');
-        currentFolderId = parent.createFolder(node.name, index);
+        currentFolderId = await parent.createFolder(node.name, index);
       }
     }
 
@@ -177,14 +177,14 @@ function createFolderStructure(
         }
       } else if (child.children.size > 0) {
         // This is a subfolder, process it recursively
-        processHierarchyNode(child, currentFolderId);
+        await processHierarchyNode(child, currentFolderId);
       }
     }
 
     return currentFolderId;
-  }
+  };
 
-  const rootFolderId = processHierarchyNode(hierarchy, parentFolderId);
+  const rootFolderId = await processHierarchyNode(hierarchy, parentFolderId);
   return { folderId: rootFolderId, docLinks };
 }
 
@@ -440,7 +440,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
         folderHierarchy.children.size > 0
       ) {
         try {
-          const { folderId, docLinks } = createFolderStructure(
+          const { folderId, docLinks } = await createFolderStructure(
             organizeService,
             folderHierarchy,
             null,
@@ -454,7 +454,7 @@ const importConfigs: Record<ImportType, ImportConfig> = {
               organizeService.folderTree.folderNode$(folderId).value;
             if (folder) {
               const index = folder.indexAt('after');
-              folder.createLink('doc', docId, index);
+              await folder.createLink('doc', docId, index);
             }
           }
         } catch (error) {

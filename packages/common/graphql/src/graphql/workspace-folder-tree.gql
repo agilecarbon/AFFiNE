@@ -1,0 +1,12 @@
+query workspaceFolderTree($workspaceId: String!) {
+  workspaceFolderTree(workspaceId: $workspaceId) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}

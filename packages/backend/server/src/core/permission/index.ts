@@ -18,6 +18,7 @@ export class PermissionModule {}
 
 export { AccessControllerBuilder as AccessController } from './builder';
 export {
+  Action,
   DOC_ACTIONS,
   type DocAction,
   DocRole,

@@ -2969,6 +2969,99 @@ export const setEnableUrlPreviewMutation = {
 }`,
 };
 
+export const workspaceFolderCreateLinkMutation = {
+  id: 'workspaceFolderCreateLinkMutation' as const,
+  op: 'workspaceFolderCreateLink',
+  query: `mutation workspaceFolderCreateLink($input: WorkspaceFolderCreateLinkInput!) {
+  workspaceFolderCreateLink(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}`,
+};
+
+export const workspaceFolderCreateMutation = {
+  id: 'workspaceFolderCreateMutation' as const,
+  op: 'workspaceFolderCreate',
+  query: `mutation workspaceFolderCreate($input: WorkspaceFolderCreateInput!) {
+  workspaceFolderCreate(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}`,
+};
+
+export const workspaceFolderDeleteMutation = {
+  id: 'workspaceFolderDeleteMutation' as const,
+  op: 'workspaceFolderDelete',
+  query: `mutation workspaceFolderDelete($input: WorkspaceFolderDeleteInput!) {
+  workspaceFolderDelete(input: $input)
+}`,
+};
+
+export const workspaceFolderMoveMutation = {
+  id: 'workspaceFolderMoveMutation' as const,
+  op: 'workspaceFolderMove',
+  query: `mutation workspaceFolderMove($input: WorkspaceFolderMoveInput!) {
+  workspaceFolderMove(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}`,
+};
+
+export const workspaceFolderRenameMutation = {
+  id: 'workspaceFolderRenameMutation' as const,
+  op: 'workspaceFolderRename',
+  query: `mutation workspaceFolderRename($input: WorkspaceFolderRenameInput!) {
+  workspaceFolderRename(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}`,
+};
+
+export const workspaceFolderTreeQuery = {
+  id: 'workspaceFolderTreeQuery' as const,
+  op: 'workspaceFolderTree',
+  query: `query workspaceFolderTree($workspaceId: String!) {
+  workspaceFolderTree(workspaceId: $workspaceId) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}`,
+};
+
 export const inviteByEmailsMutation = {
   id: 'inviteByEmailsMutation' as const,
   op: 'inviteByEmails',

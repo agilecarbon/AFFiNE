@@ -85,14 +85,14 @@ export class FolderNode extends Entity<{
     return true;
   }
 
-  createFolder(name: string, index: string) {
+  async createFolder(name: string, index: string) {
     if (this.type$.value !== 'folder') {
       throw new Error('Cannot create folder on non-folder node');
     }
-    return this.store.createFolder(this.id, name, index);
+    return await this.store.createFolder(this.id, name, index);
   }
 
-  createLink(
+  async createLink(
     type: 'doc' | 'tag' | 'collection',
     targetId: string,
     index: string
@@ -103,29 +103,29 @@ export class FolderNode extends Entity<{
     if (this.type$.value !== 'folder') {
       throw new Error('Cannot create link on non-folder node');
     }
-    this.store.createLink(this.id, type, targetId, index);
+    await this.store.createLink(this.id, type, targetId, index);
   }
 
-  delete() {
+  async delete() {
     if (this.id === null) {
       throw new Error('Cannot delete root node');
     }
     if (this.type$.value === 'folder') {
-      this.store.removeFolder(this.id);
+      await this.store.removeFolder(this.id);
     } else {
-      this.store.removeLink(this.id);
+      await this.store.removeLink(this.id);
     }
   }
 
-  moveHere(childId: string, index: string) {
-    this.store.moveNode(childId, this.id, index);
+  async moveHere(childId: string, index: string) {
+    await this.store.moveNode(childId, this.id, index);
   }
 
-  rename(name: string) {
+  async rename(name: string) {
     if (this.id === null) {
       throw new Error('Cannot rename root node');
     }
-    this.store.renameNode(this.id, name);
+    await this.store.renameNode(this.id, name);
   }
 
   indexAt(at: 'before' | 'after', targetId?: string) {

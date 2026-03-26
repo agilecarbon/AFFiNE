@@ -218,7 +218,7 @@ const NavigationPanelFolderNodeFolder = ({
     workspaceService.workspace.docCollection
   );
   const handleDelete = useCallback(() => {
-    node.delete();
+    void node.delete();
     track.$.navigationPanel.organize.deleteOrganizeItem({
       type: 'folder',
     });
@@ -252,7 +252,7 @@ const NavigationPanelFolderNodeFolder = ({
 
   const handleRename = useCallback(
     (newName: string) => {
-      node.rename(newName);
+      void node.rename(newName);
     },
     [node]
   );
@@ -272,7 +272,10 @@ const NavigationPanelFolderNodeFolder = ({
           ) {
             return;
           }
-          node.moveHere(data.source.data.entity.id, node.indexAt('before'));
+          void node.moveHere(
+            data.source.data.entity.id,
+            node.indexAt('before')
+          );
           track.$.navigationPanel.organize.moveOrganizeItem({ type: 'folder' });
         } else if (
           data.source.data.entity?.type === 'collection' ||
@@ -283,13 +286,16 @@ const NavigationPanelFolderNodeFolder = ({
             data.source.data.from?.at ===
             'navigation-panel:organize:folder-node'
           ) {
-            node.moveHere(data.source.data.from.nodeId, node.indexAt('before'));
+            void node.moveHere(
+              data.source.data.from.nodeId,
+              node.indexAt('before')
+            );
             track.$.navigationPanel.organize.moveOrganizeItem({
               type: 'link',
               target: data.source.data.entity?.type,
             });
           } else {
-            node.createLink(
+            void node.createLink(
               data.source.data.entity?.type,
               data.source.data.entity.id,
               node.indexAt('before')
@@ -351,7 +357,10 @@ const NavigationPanelFolderNodeFolder = ({
         ) {
           return;
         }
-        node.moveHere(data.source.data.entity.id, node.indexAt('before'));
+        void node.moveHere(
+          data.source.data.entity.id,
+          node.indexAt('before')
+        );
         track.$.navigationPanel.organize.moveOrganizeItem({ type: 'folder' });
       } else if (
         data.source.data.entity?.type === 'collection' ||
@@ -361,12 +370,15 @@ const NavigationPanelFolderNodeFolder = ({
         if (
           data.source.data.from?.at === 'navigation-panel:organize:folder-node'
         ) {
-          node.moveHere(data.source.data.from.nodeId, node.indexAt('before'));
+          void node.moveHere(
+            data.source.data.from.nodeId,
+            node.indexAt('before')
+          );
           track.$.navigationPanel.organize.moveOrganizeItem({
             type: data.source.data.entity?.type,
           });
         } else {
-          node.createLink(
+          void node.createLink(
             data.source.data.entity?.type,
             data.source.data.entity.id,
             node.indexAt('before')
@@ -404,7 +416,7 @@ const NavigationPanelFolderNodeFolder = ({
           ) {
             return;
           }
-          node.moveHere(
+          void node.moveHere(
             data.source.data.entity.id,
             node.indexAt(at, dropAtNode.id)
           );
@@ -418,7 +430,7 @@ const NavigationPanelFolderNodeFolder = ({
             data.source.data.from?.at ===
             'navigation-panel:organize:folder-node'
           ) {
-            node.moveHere(
+            void node.moveHere(
               data.source.data.from.nodeId,
               node.indexAt(at, dropAtNode.id)
             );
@@ -427,7 +439,7 @@ const NavigationPanelFolderNodeFolder = ({
               target: data.source.data.entity?.type,
             });
           } else {
-            node.createLink(
+            void node.createLink(
               data.source.data.entity?.type,
               data.source.data.entity.id,
               node.indexAt(at, dropAtNode.id)
@@ -585,24 +597,28 @@ const NavigationPanelFolderNodeFolder = ({
   );
 
   const handleNewDoc = useCallback(() => {
-    const newDoc = createPage();
-    node.createLink('doc', newDoc.id, node.indexAt('before'));
-    track.$.navigationPanel.folders.createDoc();
-    track.$.navigationPanel.organize.createOrganizeItem({
-      type: 'link',
-      target: 'doc',
-    });
-    setCollapsed(false);
+    void (async () => {
+      const newDoc = createPage();
+      await node.createLink('doc', newDoc.id, node.indexAt('before'));
+      track.$.navigationPanel.folders.createDoc();
+      track.$.navigationPanel.organize.createOrganizeItem({
+        type: 'link',
+        target: 'doc',
+      });
+      setCollapsed(false);
+    })();
   }, [createPage, node, setCollapsed]);
 
   const handleCreateSubfolder = useCallback(() => {
-    const newFolderId = node.createFolder(
-      t['com.affine.rootAppSidebar.organize.new-folders'](),
-      node.indexAt('before')
-    );
-    track.$.navigationPanel.organize.createOrganizeItem({ type: 'folder' });
-    setCollapsed(false);
-    setNewFolderId(newFolderId);
+    void (async () => {
+      const newFolderId = await node.createFolder(
+        t['com.affine.rootAppSidebar.organize.new-folders'](),
+        node.indexAt('before')
+      );
+      track.$.navigationPanel.organize.createOrganizeItem({ type: 'folder' });
+      setCollapsed(false);
+      setNewFolderId(newFolderId);
+    })();
   }, [node, setCollapsed, t]);
 
   const handleAddToFolder = useCallback(
@@ -634,9 +650,11 @@ const NavigationPanelFolderNodeFolder = ({
           );
 
           newItemIds.forEach(id => {
-            node.createLink(type, id, node.indexAt('after'));
+            void node.createLink(type, id, node.indexAt('after'));
           });
-          removedItems.forEach(node => node.delete());
+          removedItems.forEach(node => {
+            void node.delete();
+          });
           const updated = newItemIds.length + removedItems.length;
           updated && setCollapsed(false);
         }
@@ -766,7 +784,9 @@ const NavigationPanelFolderNodeFolder = ({
                 prefixIcon={<RemoveFolderIcon />}
                 data-event-props="$.navigationPanel.organize.deleteOrganizeItem"
                 data-event-args-type={node.type$.value}
-                onClick={() => node.delete()}
+                onClick={() => {
+                  void node.delete();
+                }}
               >
                 {t['com.affine.rootAppSidebar.organize.delete-from-folder']()}
               </MenuItem>

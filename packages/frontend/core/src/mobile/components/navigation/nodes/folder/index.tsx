@@ -167,7 +167,7 @@ const NavigationPanelFolderNodeFolder = ({
     workspaceService.workspace.docCollection
   );
   const handleDelete = useCallback(() => {
-    node.delete();
+    void node.delete();
     track.$.navigationPanel.organize.deleteOrganizeItem({
       type: 'folder',
     });
@@ -183,27 +183,31 @@ const NavigationPanelFolderNodeFolder = ({
 
   const handleRename = useCallback(
     (newName: string) => {
-      node.rename(newName);
+      void node.rename(newName);
     },
     [node]
   );
 
   const handleNewDoc = useCallback(() => {
-    const newDoc = createPage();
-    node.createLink('doc', newDoc.id, node.indexAt('before'));
-    track.$.navigationPanel.folders.createDoc();
-    track.$.navigationPanel.organize.createOrganizeItem({
-      type: 'link',
-      target: 'doc',
-    });
-    setCollapsed(false);
+    void (async () => {
+      const newDoc = createPage();
+      await node.createLink('doc', newDoc.id, node.indexAt('before'));
+      track.$.navigationPanel.folders.createDoc();
+      track.$.navigationPanel.organize.createOrganizeItem({
+        type: 'link',
+        target: 'doc',
+      });
+      setCollapsed(false);
+    })();
   }, [createPage, node, setCollapsed]);
 
   const handleCreateSubfolder = useCallback(
     (name: string) => {
-      node.createFolder(name, node.indexAt('before'));
-      track.$.navigationPanel.organize.createOrganizeItem({ type: 'folder' });
-      setCollapsed(false);
+      void (async () => {
+        await node.createFolder(name, node.indexAt('before'));
+        track.$.navigationPanel.organize.createOrganizeItem({ type: 'folder' });
+        setCollapsed(false);
+      })();
     },
     [node, setCollapsed]
   );
@@ -237,9 +241,11 @@ const NavigationPanelFolderNodeFolder = ({
           );
 
           newItemIds.forEach(id => {
-            node.createLink(type, id, node.indexAt('after'));
+            void node.createLink(type, id, node.indexAt('after'));
           });
-          removedItems.forEach(node => node.delete());
+          removedItems.forEach(node => {
+            void node.delete();
+          });
           const updated = newItemIds.length + removedItems.length;
           updated && setCollapsed(false);
         }
@@ -401,7 +407,9 @@ const NavigationPanelFolderNodeFolder = ({
                 prefixIcon={<RemoveFolderIcon />}
                 data-event-props="$.navigationPanel.organize.deleteOrganizeItem"
                 data-event-args-type={node.type$.value}
-                onClick={() => node.delete()}
+                onClick={() => {
+                  void node.delete();
+                }}
               >
                 {t['com.affine.rootAppSidebar.organize.delete-from-folder']()}
               </MenuItem>

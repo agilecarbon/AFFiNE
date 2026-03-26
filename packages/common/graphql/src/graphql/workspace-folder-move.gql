@@ -1,0 +1,12 @@
+mutation workspaceFolderMove($input: WorkspaceFolderMoveInput!) {
+  workspaceFolderMove(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}
