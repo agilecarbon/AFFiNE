@@ -17,6 +17,7 @@ export const Actions = {
     TransferOwner: '',
     Organize: {
       Read: '',
+      Manage: '',
     },
     Users: {
       Read: '',
@@ -91,6 +92,7 @@ export const RoleActionsMap = {
         Action.Workspace.Sync,
         Action.Workspace.CreateDoc,
         Action.Workspace.Users.Read,
+        Action.Workspace.Organize.Manage,
         Action.Workspace.Settings.Read,
         Action.Workspace.Blobs.Write,
         Action.Workspace.Blobs.List,

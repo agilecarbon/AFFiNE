@@ -30,8 +30,8 @@ export const NavigationPanelOrganize = () => {
   const isLoading = useLiveData(folderTree.isLoading$);
 
   const handleCreateFolder = useCallback(
-    (name: string) => {
-      const newFolderId = rootFolder.createFolder(
+    async (name: string) => {
+      const newFolderId = await rootFolder.createFolder(
         name,
         rootFolder.indexAt('before')
       );

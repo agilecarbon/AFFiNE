@@ -1828,6 +1828,16 @@ export interface Mutation {
   /** Upload a comment attachment and return the access url */
   uploadCommentAttachment: Scalars['String']['output'];
   verifyEmail: Scalars['Boolean']['output'];
+  /** Create a folder node */
+  workspaceFolderCreate: WorkspaceFolderNode;
+  /** Create a folder link node */
+  workspaceFolderCreateLink: WorkspaceFolderNode;
+  /** Delete a folder or link node */
+  workspaceFolderDelete: Scalars['Boolean']['output'];
+  /** Move a folder or link node */
+  workspaceFolderMove: WorkspaceFolderNode;
+  /** Rename a folder node */
+  workspaceFolderRename: WorkspaceFolderNode;
 }
 
 export interface MutationAbortBlobUploadArgs {
@@ -2288,6 +2298,26 @@ export interface MutationVerifyEmailArgs {
   token: Scalars['String']['input'];
 }
 
+export interface MutationWorkspaceFolderCreateArgs {
+  input: WorkspaceFolderCreateInput;
+}
+
+export interface MutationWorkspaceFolderCreateLinkArgs {
+  input: WorkspaceFolderCreateLinkInput;
+}
+
+export interface MutationWorkspaceFolderDeleteArgs {
+  input: WorkspaceFolderDeleteInput;
+}
+
+export interface MutationWorkspaceFolderMoveArgs {
+  input: WorkspaceFolderMoveInput;
+}
+
+export interface MutationWorkspaceFolderRenameArgs {
+  input: WorkspaceFolderRenameInput;
+}
+
 export interface NoCopilotProviderAvailableDataType {
   __typename?: 'NoCopilotProviderAvailableDataType';
   modelId: Scalars['String']['output'];
@@ -2529,6 +2559,12 @@ export interface Query {
   validateAppConfig: Array<AppConfigValidateResult>;
   /** Get workspace by id */
   workspace: WorkspaceType;
+  /** Get a single folder node by id */
+  workspaceFolder: WorkspaceFolderNode;
+  /** Return all folder nodes for a workspace */
+  workspaceFolderTree: Array<WorkspaceFolderNode>;
+  /** Return folder nodes for a workspace and optional parent */
+  workspaceFolders: Array<WorkspaceFolderNode>;
   /**
    * Get workspace role permissions
    * @deprecated use WorkspaceType[permissions] instead
@@ -2608,6 +2644,19 @@ export interface QueryValidateAppConfigArgs {
 
 export interface QueryWorkspaceArgs {
   id: Scalars['String']['input'];
+}
+
+export interface QueryWorkspaceFolderArgs {
+  id: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface QueryWorkspaceFolderTreeArgs {
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface QueryWorkspaceFoldersArgs {
+  input: WorkspaceFolderListInput;
 }
 
 export interface QueryWorkspaceRolePermissionsArgs {
@@ -3263,6 +3312,63 @@ export interface WorkspaceDocMeta {
   createdBy: Maybe<EditorType>;
   updatedAt: Scalars['DateTime']['output'];
   updatedBy: Maybe<EditorType>;
+}
+
+export interface WorkspaceFolderCreateInput {
+  index: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface WorkspaceFolderCreateLinkInput {
+  index: Scalars['String']['input'];
+  parentId: Scalars['String']['input'];
+  targetId: Scalars['String']['input'];
+  targetType: WorkspaceFolderNodeType;
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface WorkspaceFolderDeleteInput {
+  id: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface WorkspaceFolderListInput {
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface WorkspaceFolderMoveInput {
+  id: Scalars['String']['input'];
+  index: Scalars['String']['input'];
+  parentId?: InputMaybe<Scalars['String']['input']>;
+  workspaceId: Scalars['String']['input'];
+}
+
+export interface WorkspaceFolderNode {
+  __typename?: 'WorkspaceFolderNode';
+  createdAt: Scalars['DateTime']['output'];
+  data: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  index: Scalars['String']['output'];
+  parentId: Maybe<Scalars['String']['output']>;
+  type: WorkspaceFolderNodeType;
+  updatedAt: Scalars['DateTime']['output'];
+  workspaceId: Scalars['String']['output'];
+}
+
+export enum WorkspaceFolderNodeType {
+  collection = 'collection',
+  doc = 'doc',
+  folder = 'folder',
+  tag = 'tag',
+}
+
+export interface WorkspaceFolderRenameInput {
+  id: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  workspaceId: Scalars['String']['input'];
 }
 
 /** Workspace invite link expire time */
@@ -7342,6 +7448,110 @@ export type SetEnableUrlPreviewMutation = {
   updateWorkspace: { __typename?: 'WorkspaceType'; id: string };
 };
 
+export type WorkspaceFolderCreateLinkMutationVariables = Exact<{
+  input: WorkspaceFolderCreateLinkInput;
+}>;
+
+export type WorkspaceFolderCreateLinkMutation = {
+  __typename?: 'Mutation';
+  workspaceFolderCreateLink: {
+    __typename?: 'WorkspaceFolderNode';
+    workspaceId: string;
+    id: string;
+    parentId: string | null;
+    type: WorkspaceFolderNodeType;
+    data: string;
+    index: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type WorkspaceFolderCreateMutationVariables = Exact<{
+  input: WorkspaceFolderCreateInput;
+}>;
+
+export type WorkspaceFolderCreateMutation = {
+  __typename?: 'Mutation';
+  workspaceFolderCreate: {
+    __typename?: 'WorkspaceFolderNode';
+    workspaceId: string;
+    id: string;
+    parentId: string | null;
+    type: WorkspaceFolderNodeType;
+    data: string;
+    index: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type WorkspaceFolderDeleteMutationVariables = Exact<{
+  input: WorkspaceFolderDeleteInput;
+}>;
+
+export type WorkspaceFolderDeleteMutation = {
+  __typename?: 'Mutation';
+  workspaceFolderDelete: boolean;
+};
+
+export type WorkspaceFolderMoveMutationVariables = Exact<{
+  input: WorkspaceFolderMoveInput;
+}>;
+
+export type WorkspaceFolderMoveMutation = {
+  __typename?: 'Mutation';
+  workspaceFolderMove: {
+    __typename?: 'WorkspaceFolderNode';
+    workspaceId: string;
+    id: string;
+    parentId: string | null;
+    type: WorkspaceFolderNodeType;
+    data: string;
+    index: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type WorkspaceFolderRenameMutationVariables = Exact<{
+  input: WorkspaceFolderRenameInput;
+}>;
+
+export type WorkspaceFolderRenameMutation = {
+  __typename?: 'Mutation';
+  workspaceFolderRename: {
+    __typename?: 'WorkspaceFolderNode';
+    workspaceId: string;
+    id: string;
+    parentId: string | null;
+    type: WorkspaceFolderNodeType;
+    data: string;
+    index: string;
+    createdAt: string;
+    updatedAt: string;
+  };
+};
+
+export type WorkspaceFolderTreeQueryVariables = Exact<{
+  workspaceId: Scalars['String']['input'];
+}>;
+
+export type WorkspaceFolderTreeQuery = {
+  __typename?: 'Query';
+  workspaceFolderTree: Array<{
+    __typename?: 'WorkspaceFolderNode';
+    workspaceId: string;
+    id: string;
+    parentId: string | null;
+    type: WorkspaceFolderNodeType;
+    data: string;
+    index: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
+};
+
 export type InviteByEmailsMutationVariables = Exact<{
   workspaceId: Scalars['String']['input'];
   emails: Array<Scalars['String']['input']> | Scalars['String']['input'];
@@ -7914,6 +8124,11 @@ export type Queries =
       response: GetWorkspaceConfigQuery;
     }
   | {
+      name: 'workspaceFolderTreeQuery';
+      variables: WorkspaceFolderTreeQueryVariables;
+      response: WorkspaceFolderTreeQuery;
+    }
+  | {
       name: 'workspaceInvoicesQuery';
       variables: WorkspaceInvoicesQueryVariables;
       response: WorkspaceInvoicesQuery;
@@ -8429,6 +8644,31 @@ export type Mutations =
       name: 'setEnableUrlPreviewMutation';
       variables: SetEnableUrlPreviewMutationVariables;
       response: SetEnableUrlPreviewMutation;
+    }
+  | {
+      name: 'workspaceFolderCreateLinkMutation';
+      variables: WorkspaceFolderCreateLinkMutationVariables;
+      response: WorkspaceFolderCreateLinkMutation;
+    }
+  | {
+      name: 'workspaceFolderCreateMutation';
+      variables: WorkspaceFolderCreateMutationVariables;
+      response: WorkspaceFolderCreateMutation;
+    }
+  | {
+      name: 'workspaceFolderDeleteMutation';
+      variables: WorkspaceFolderDeleteMutationVariables;
+      response: WorkspaceFolderDeleteMutation;
+    }
+  | {
+      name: 'workspaceFolderMoveMutation';
+      variables: WorkspaceFolderMoveMutationVariables;
+      response: WorkspaceFolderMoveMutation;
+    }
+  | {
+      name: 'workspaceFolderRenameMutation';
+      variables: WorkspaceFolderRenameMutationVariables;
+      response: WorkspaceFolderRenameMutation;
     }
   | {
       name: 'inviteByEmailsMutation';

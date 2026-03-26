@@ -1527,6 +1527,21 @@ type Mutation {
   createWorkspace(init: Upload): WorkspaceType!
   deactivateLicense(workspaceId: String!): Boolean!
   deleteAccount: DeleteAccount!
+
+  """Create a folder node"""
+  workspaceFolderCreate(input: WorkspaceFolderCreateInput!): WorkspaceFolderNode!
+
+  """Create a folder link node"""
+  workspaceFolderCreateLink(input: WorkspaceFolderCreateLinkInput!): WorkspaceFolderNode!
+
+  """Rename a folder node"""
+  workspaceFolderRename(input: WorkspaceFolderRenameInput!): WorkspaceFolderNode!
+
+  """Move a folder or link node"""
+  workspaceFolderMove(input: WorkspaceFolderMoveInput!): WorkspaceFolderNode!
+
+  """Delete a folder or link node"""
+  workspaceFolderDelete(input: WorkspaceFolderDeleteInput!): Boolean!
   deleteBlob(hash: String @deprecated(reason: "use parameter [key]"), key: String, permanently: Boolean! = false, workspaceId: String!): Boolean!
 
   """Delete a comment"""
@@ -1909,6 +1924,15 @@ type Query {
 
   """Get workspace by id"""
   workspace(id: String!): WorkspaceType!
+
+  """Get a single folder node by id"""
+  workspaceFolder(id: String!, workspaceId: String!): WorkspaceFolderNode!
+
+  """Return folder nodes for a workspace and optional parent"""
+  workspaceFolders(input: WorkspaceFolderListInput!): [WorkspaceFolderNode!]!
+
+  """Return all folder nodes for a workspace"""
+  workspaceFolderTree(workspaceId: String!): [WorkspaceFolderNode!]!
 
   """Get workspace role permissions"""
   workspaceRolePermissions(id: String!): WorkspaceRolePermissions! @deprecated(reason: "use WorkspaceType[permissions] instead")
@@ -2623,6 +2647,62 @@ type WorkspaceQuotaType {
 type WorkspaceRolePermissions {
   permissions: WorkspacePermissions!
   role: Permission!
+}
+
+enum WorkspaceFolderNodeType {
+  collection
+  doc
+  folder
+  tag
+}
+
+type WorkspaceFolderNode {
+  createdAt: DateTime!
+  data: String!
+  id: String!
+  index: String!
+  parentId: String
+  type: WorkspaceFolderNodeType!
+  updatedAt: DateTime!
+  workspaceId: String!
+}
+
+input WorkspaceFolderListInput {
+  parentId: String
+  workspaceId: String!
+}
+
+input WorkspaceFolderCreateInput {
+  index: String!
+  name: String!
+  parentId: String
+  workspaceId: String!
+}
+
+input WorkspaceFolderCreateLinkInput {
+  index: String!
+  parentId: String!
+  targetId: String!
+  targetType: WorkspaceFolderNodeType!
+  workspaceId: String!
+}
+
+input WorkspaceFolderRenameInput {
+  id: String!
+  name: String!
+  workspaceId: String!
+}
+
+input WorkspaceFolderMoveInput {
+  id: String!
+  index: String!
+  parentId: String
+  workspaceId: String!
+}
+
+input WorkspaceFolderDeleteInput {
+  id: String!
+  workspaceId: String!
 }
 
 type WorkspaceType {

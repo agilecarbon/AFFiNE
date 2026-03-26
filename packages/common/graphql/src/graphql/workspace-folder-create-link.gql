@@ -1,0 +1,12 @@
+mutation workspaceFolderCreateLink($input: WorkspaceFolderCreateLinkInput!) {
+  workspaceFolderCreateLink(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}

@@ -1,0 +1,3 @@
+mutation workspaceFolderDelete($input: WorkspaceFolderDeleteInput!) {
+  workspaceFolderDelete(input: $input)
+}

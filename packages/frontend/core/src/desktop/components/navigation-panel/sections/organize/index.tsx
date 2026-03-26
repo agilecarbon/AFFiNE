@@ -38,8 +38,8 @@ export const NavigationPanelOrganize = () => {
   const folders = useLiveData(rootFolder.sortedChildren$);
   const isLoading = useLiveData(folderTree.isLoading$);
 
-  const handleCreateFolder = useCallback(() => {
-    const newFolderId = rootFolder.createFolder(
+  const handleCreateFolder = useCallback(async () => {
+    const newFolderId = await rootFolder.createFolder(
       'New Folder',
       rootFolder.indexAt('before')
     );
@@ -61,7 +61,7 @@ export const NavigationPanelOrganize = () => {
         const at =
           data.treeInstruction?.type === 'reorder-below' ? 'after' : 'before';
         if (data.source.data.entity?.type === 'folder') {
-          rootFolder.moveHere(
+          void rootFolder.moveHere(
             data.source.data.entity.id,
             rootFolder.indexAt(at, node.id)
           );
@@ -78,18 +78,23 @@ export const NavigationPanelOrganize = () => {
 
   const createFolderAndDrop = useCallback(
     (data: DropTargetDropEvent<AffineDNDData>) => {
-      const newFolderId = handleCreateFolder();
-      setNewFolderId(null);
-      const newFolder$ = folderTree.folderNode$(newFolderId);
+      void (async () => {
+        const newFolderId = await handleCreateFolder();
+        if (!newFolderId) {
+          return;
+        }
+        setNewFolderId(null);
+        const newFolder$ = folderTree.folderNode$(newFolderId);
 
-      const entity = data.source.data.entity;
-      if (!entity) return;
-      const { type, id } = entity;
-      if (type !== 'doc' && type !== 'tag' && type !== 'collection') return;
+        const entity = data.source.data.entity;
+        if (!entity) return;
+        const { type, id } = entity;
+        if (type !== 'doc' && type !== 'tag' && type !== 'collection') return;
 
-      const folder = newFolder$.value;
-      if (!folder) return;
-      folder.createLink(type, id, folder.indexAt('after'));
+        const folder = newFolder$.value;
+        if (!folder) return;
+        await folder.createLink(type, id, folder.indexAt('after'));
+      })();
     },
     [folderTree, handleCreateFolder]
   );
@@ -109,7 +114,9 @@ export const NavigationPanelOrganize = () => {
       actions={
         <IconButton
           data-testid="navigation-panel-bar-add-organize-button"
-          onClick={handleCreateFolder}
+          onClick={() => {
+            void handleCreateFolder();
+          }}
           size="16"
           tooltip={t[
             'com.affine.rootAppSidebar.explorer.organize-section-add-tooltip'
@@ -122,7 +129,9 @@ export const NavigationPanelOrganize = () => {
       <NavigationPanelTreeRoot
         placeholder={
           <RootEmpty
-            onClickCreate={handleCreateFolder}
+            onClickCreate={() => {
+              void handleCreateFolder();
+            }}
             isLoading={isLoading}
             onDrop={createFolderAndDrop}
           />

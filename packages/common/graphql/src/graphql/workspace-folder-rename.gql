@@ -1,0 +1,12 @@
+mutation workspaceFolderRename($input: WorkspaceFolderRenameInput!) {
+  workspaceFolderRename(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}

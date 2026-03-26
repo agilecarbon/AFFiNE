@@ -1,0 +1,12 @@
+mutation workspaceFolderCreate($input: WorkspaceFolderCreateInput!) {
+  workspaceFolderCreate(input: $input) {
+    workspaceId
+    id
+    parentId
+    type
+    data
+    index
+    createdAt
+    updatedAt
+  }
+}

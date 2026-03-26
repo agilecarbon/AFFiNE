@@ -37,6 +37,7 @@ import { WorkspaceModel } from './workspace';
 import { WorkspaceAnalyticsModel } from './workspace-analytics';
 import { WorkspaceCalendarModel } from './workspace-calendar';
 import { WorkspaceFeatureModel } from './workspace-feature';
+import { WorkspaceFolderModel } from './workspace-folder';
 import { WorkspaceUserModel } from './workspace-user';
 
 const MODELS = {
@@ -48,6 +49,7 @@ const MODELS = {
   workspace: WorkspaceModel,
   userFeature: UserFeatureModel,
   workspaceFeature: WorkspaceFeatureModel,
+  workspaceFolder: WorkspaceFolderModel,
   doc: DocModel,
   userDoc: UserDocModel,
   workspaceUser: WorkspaceUserModel,
@@ -149,4 +151,5 @@ export * from './workspace';
 export * from './workspace-analytics';
 export * from './workspace-calendar';
 export * from './workspace-feature';
+export * from './workspace-folder';
 export * from './workspace-user';
