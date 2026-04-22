@@ -36,10 +36,45 @@ export declare class ShareableContent {
   static tapGlobalAudio(excludedProcesses: Array<ApplicationInfo> | undefined | null, audioStreamCallback: ((err: Error | null, arg: Float32Array) => void)): AudioCaptureSession
 }
 
+export declare function abortRecording(id: string): Promise<void>
+
 export declare function decodeAudio(buf: Uint8Array, destSampleRate?: number | undefined | null, filename?: string | undefined | null, signal?: AbortSignal | undefined | null): Promise<Float32Array>
 
 /** Decode audio file into a Float32Array */
 export declare function decodeAudioSync(buf: Uint8Array, destSampleRate?: number | undefined | null, filename?: string | undefined | null): Float32Array
+
+export interface RecordingArtifact {
+  id: string
+  filepath: string
+  sampleRate: number
+  channels: number
+  durationMs: number
+  size: number
+  degraded: boolean
+  overflowCount: number
+}
+
+export interface RecordingSessionMeta {
+  id: string
+  filepath: string
+  sampleRate: number
+  channels: number
+  startedAt: number
+}
+
+export interface RecordingStartOptions {
+  appProcessId?: number
+  excludeProcessIds?: Array<number>
+  outputDir: string
+  format?: string
+  sampleRate?: number
+  channels?: number
+  id?: string
+}
+
+export declare function startRecording(opts: RecordingStartOptions): Promise<RecordingSessionMeta>
+
+export declare function stopRecording(id: string): Promise<RecordingArtifact>
 export interface MermaidRenderOptions {
   theme?: string
   fontFamily?: string
