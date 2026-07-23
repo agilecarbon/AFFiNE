@@ -50,11 +50,10 @@ test.before(async t => {
       workspace: {
         create: {
           id: 'public',
-          public: true,
+          accessPolicy: { create: { visibility: 'public' } },
         },
       },
       docId: 'private',
-      public: false,
     },
   });
 
@@ -63,11 +62,10 @@ test.before(async t => {
       workspace: {
         create: {
           id: 'private',
-          public: false,
+          accessPolicy: { create: {} },
         },
       },
       docId: 'public',
-      public: true,
     },
   });
 
@@ -76,12 +74,27 @@ test.before(async t => {
       workspace: {
         create: {
           id: 'totally-private',
-          public: false,
+          accessPolicy: { create: {} },
         },
       },
       docId: 'private',
-      public: false,
     },
+  });
+  await db.docAccessPolicy.createMany({
+    data: [
+      { workspaceId: 'public', docId: 'private', visibility: 'private' },
+      {
+        workspaceId: 'private',
+        docId: 'public',
+        visibility: 'public',
+        publicRole: 'external',
+      },
+      {
+        workspaceId: 'totally-private',
+        docId: 'private',
+        visibility: 'private',
+      },
+    ],
   });
 });
 
@@ -185,8 +198,7 @@ test('should be able to get permission granted workspace', async t => {
 test('should return 404 if blob not found', async t => {
   const { app, storage } = t.context;
 
-  // @ts-expect-error mock
-  storage.get.resolves({ body: null });
+  storage.get.resolves({ body: undefined });
   const res = await app.GET('/api/workspaces/public/blobs/test');
 
   t.is(res.status, HttpStatus.NOT_FOUND);

@@ -184,15 +184,15 @@ export function useAFFiNEI18N(): {
       */
     Enable(): string;
     /**
-      * `Enable AFFiNE Cloud`
+      * `Enable AFFiNE Sync`
       */
     ["Enable AFFiNE Cloud"](): string;
     /**
-      * `If enabled, the data in this workspace will be backed up and synchronised via AFFiNE Cloud.`
+      * `Your workspace will be synced and backed up with AFFiNE Sync.`
       */
     ["Enable AFFiNE Cloud Description"](): string;
     /**
-      * `The following functions rely on AFFiNE Cloud. All data is stored on the current device. You can enable AFFiNE Cloud for this workspace to keep data in sync with the cloud.`
+      * `Some features need AFFiNE Sync. Web workspaces are saved in this browser and may be removed automatically when disk space is low. Enable AFFiNE Sync to keep this workspace safer and available across devices.`
       */
     ["Enable cloud hint"](): string;
     /**
@@ -438,7 +438,7 @@ export function useAFFiNEI18N(): {
       */
     Select(): string;
     /**
-      * `Sign in`
+      * `Sign in to AFFiNE`
       */
     ["Sign in"](): string;
     /**
@@ -446,7 +446,7 @@ export function useAFFiNEI18N(): {
       */
     ["Sign in and Enable"](): string;
     /**
-      * `Sign out`
+      * `Sign out of AFFiNE`
       */
     ["Sign out"](): string;
     /**
@@ -481,10 +481,6 @@ export function useAFFiNEI18N(): {
       * `Sync`
       */
     Sync(): string;
-    /**
-      * `Synced with AFFiNE Cloud`
-      */
-    ["Synced with AFFiNE Cloud"](): string;
     /**
       * `Tags`
       */
@@ -1105,7 +1101,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.change.email.page.subtitle"](): string;
     /**
-      * `Congratulations! You have successfully updated the email address associated with your AFFiNE Cloud account.`
+      * `Congratulations! You have successfully updated the email address associated with your AFFiNE account.`
       */
     ["com.affine.auth.change.email.page.success.subtitle"](): string;
     /**
@@ -1168,7 +1164,7 @@ export function useAFFiNEI18N(): {
         max: string;
     }>): string;
     /**
-      * `Welcome to AFFiNE Cloud, you are almost there!`
+      * `Welcome to AFFiNE, you're almost there!`
       */
     ["com.affine.auth.page.sent.email.title"](): string;
     /**
@@ -1196,7 +1192,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.reset.password.page.success"](): string;
     /**
-      * `Reset your AFFiNE Cloud password`
+      * `Reset your AFFiNE password`
       */
     ["com.affine.auth.reset.password.page.title"](): string;
     /**
@@ -1250,7 +1246,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.sent.change.password.hint"](): string;
     /**
-      * `Your password has been updated! You can sign in AFFiNE Cloud with new password!`
+      * `Your password has been updated! You can sign in to AFFiNE with the new password.`
       */
     ["com.affine.auth.sent.reset.password.success.message"](): string;
     /**
@@ -1258,7 +1254,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.sent.set.password.hint"](): string;
     /**
-      * `Your password has saved! You can sign in AFFiNE Cloud with email and password!`
+      * `Your password has been saved! You can sign in to AFFiNE with email and password.`
       */
     ["com.affine.auth.sent.set.password.success.message"](): string;
     /**
@@ -1297,7 +1293,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.set.password.page.success"](): string;
     /**
-      * `Set your AFFiNE Cloud password`
+      * `Set your AFFiNE password`
       */
     ["com.affine.auth.set.password.page.title"](): string;
     /**
@@ -1323,7 +1319,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.sign-out.confirm-modal.confirm"](): string;
     /**
-      * `After signing out, the Cloud Workspaces associated with this account will be removed from the current device, and signing in again will add them back.`
+      * `After signing out, synced workspaces associated with this account will be removed from this device. Signing in again will add them back.`
       */
     ["com.affine.auth.sign-out.confirm-modal.description"](): string;
     /**
@@ -1355,7 +1351,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.sign.email.placeholder"](): string;
     /**
-      * `Sign in`
+      * `Sign in to AFFiNE`
       */
     ["com.affine.auth.sign.in"](): string;
     /**
@@ -1363,15 +1359,15 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.sign.in.sent.email.subtitle"](): string;
     /**
-      * `Self-Hosted`
+      * `Self-hosted AFFiNE`
       */
     ["com.affine.auth.sign.add-selfhosted.title"](): string;
     /**
-      * `Connect to a Self-Hosted Instance`
+      * `Connect to your AFFiNE server`
       */
     ["com.affine.auth.sign.add-selfhosted"](): string;
     /**
-      * `Server URL`
+      * `AFFiNE Server URL`
       */
     ["com.affine.auth.sign.add-selfhosted.baseurl"](): string;
     /**
@@ -1415,7 +1411,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.auth.toast.message.failed"](): string;
     /**
-      * `You have been signed in, start to sync your data with AFFiNE Cloud!`
+      * `You have signed in to AFFiNE.`
       */
     ["com.affine.auth.toast.message.signed-in"](): string;
     /**
@@ -1437,7 +1433,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.backButton"](): string;
     /**
-      * `Your local data is stored in the browser and may be lost. Don't risk it - enable cloud now!`
+      * `Your workspace is saved in this browser. When disk space is low, the browser may remove it automatically. Enable AFFiNE Sync to keep it safer.`
       */
     ["com.affine.banner.local-warning"](): string;
     /**
@@ -2087,17 +2083,17 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.enableAffineCloudModal.button.cancel"](): string;
     /**
-      * `Enable Cloud for {{workspaceName}}`
+      * `Enable AFFiNE Sync for {{workspaceName}}`
       */
     ["com.affine.enableAffineCloudModal.custom-server.title"](options: {
         readonly workspaceName: string;
     }): string;
     /**
-      * `Choose an instance.`
+      * `Choose where this workspace will sync.`
       */
     ["com.affine.enableAffineCloudModal.custom-server.description"](): string;
     /**
-      * `Enable Cloud`
+      * `Enable AFFiNE Sync`
       */
     ["com.affine.enableAffineCloudModal.custom-server.enable"](): string;
     /**
@@ -2349,15 +2345,15 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.history-vision.tips-modal.cancel"](): string;
     /**
-      * `Enable AFFiNE Cloud`
+      * `Enable AFFiNE Sync`
       */
     ["com.affine.history-vision.tips-modal.confirm"](): string;
     /**
-      * `The current workspace is a local workspace, and we do not support version history for it at the moment. You can enable AFFiNE Cloud. This will sync the workspace with the Cloud, allowing you to use this feature.`
+      * `Version history can't work with local workspace. Enable AFFiNE Sync for this workspace to use version history.`
       */
     ["com.affine.history-vision.tips-modal.description"](): string;
     /**
-      * `History vision needs AFFiNE Cloud`
+      * `Version history needs AFFiNE Sync`
       */
     ["com.affine.history-vision.tips-modal.title"](): string;
     /**
@@ -2463,6 +2459,14 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.import.affine-workspace-data"](): string;
     /**
+      * `Bear (.bear2bk) (Experimental)`
+      */
+    ["com.affine.import.bear"](): string;
+    /**
+      * `Import your Bear note backup. Tags will be converted to AFFiNE tags and folders.`
+      */
+    ["com.affine.import.bear.tooltip"](): string;
+    /**
       * `Docx`
       */
     ["com.affine.import.docx"](): string;
@@ -2495,7 +2499,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.import.modal.tip"](): string;
     /**
-      * `Notion`
+      * `Notion (Experimental)`
       */
     ["com.affine.import.notion"](): string;
     /**
@@ -2503,7 +2507,19 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.import.notion.tooltip"](): string;
     /**
-      * `Obsidian Vault`
+      * `OneNote (Experimental)`
+      */
+    ["com.affine.import.onenote"](): string;
+    /**
+      * `Import a OneNote .one, .onetoc2, or .onepkg file. Available in the desktop app.`
+      */
+    ["com.affine.import.onenote.tooltip"](): string;
+    /**
+      * `This format importer is available in the AFFiNE desktop app.`
+      */
+    ["com.affine.import.onenote.desktop-only"](): string;
+    /**
+      * `Obsidian Vault (Experimental)`
       */
     ["com.affine.import.obsidian"](): string;
     /**
@@ -2949,15 +2965,15 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.multi-tab.new-tab"](): string;
     /**
-      * `Enabling AFFiNE Cloud allows you to synchronise and backup data, as well as support multi-user collaboration and content publishing.`
+      * `AFFiNE Sync keeps your workspace backed up, available across devices, and ready for collaboration and publishing.`
       */
     ["com.affine.nameWorkspace.affine-cloud.description"](): string;
     /**
-      * `Sync across devices with AFFiNE Cloud`
+      * `Sync across devices with AFFiNE Sync`
       */
     ["com.affine.nameWorkspace.affine-cloud.title"](): string;
     /**
-      * `If you want the workspace to be stored locally, you can download the desktop client.`
+      * `In the web app, workspaces are saved in this browser. If disk space runs low, the browser may remove them automatically. For fully local storage, use the desktop app.`
       */
     ["com.affine.nameWorkspace.affine-cloud.web-tips"](): string;
     /**
@@ -4200,12 +4216,11 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.payment.member.team.invite.done"](): string;
     /**
-      * `Invitation sent,{{successCount}} successful, {{failedCount}} failed`
+      * `Invitations sent: {{count}}`
       */
-    ["com.affine.payment.member.team.invite.notify.title"](options: Readonly<{
-        successCount: string;
-        failedCount: string;
-    }>): string;
+    ["com.affine.payment.member.team.invite.notify.title"](options: {
+        readonly count: string;
+    }): string;
     /**
       * `These email addresses have already been invited:`
       */
@@ -5043,7 +5058,7 @@ export function useAFFiNEI18N(): {
         readonly server: string;
     }): string;
     /**
-      * `Once deleted, your account will no longer be accessible, and all data in your personal cloud space will be permanently deleted.`
+      * `Once deleted, your account will no longer be accessible, and all data in your personal space on the server will be permanently deleted.`
       */
     ["com.affine.setting.account.delete.message"](): string;
     /**
@@ -5071,7 +5086,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.setting.account.delete.success-title"](): string;
     /**
-      * `Your account and cloud data have been deleted.`
+      * `Your account and server-side data have been deleted.`
       */
     ["com.affine.setting.account.delete.success-description-1"](): string;
     /**
@@ -5083,7 +5098,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.setting.account.message"](): string;
     /**
-      * `Sync with AFFiNE Cloud`
+      * `Sync with AFFiNE`
       */
     ["com.affine.setting.sign.message"](): string;
     /**
@@ -5531,6 +5546,14 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.editorSettings.general.auto-date-title.format.journal"](): string;
     /**
+      * `Display add icon option`
+      */
+    ["com.affine.settings.editorSettings.general.add-icon-option.title"](): string;
+    /**
+      * `Show or hide the add icon option for docs without an icon.`
+      */
+    ["com.affine.settings.editorSettings.general.add-icon-option.description"](): string;
+    /**
       * `Customize your text experience.`
       */
     ["com.affine.settings.editorSettings.general.font-family.custom.description"](): string;
@@ -5683,7 +5706,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.email.action.verify"](): string;
     /**
-      * `Enable AFFiNE Cloud to collaborate with others`
+      * `Enable AFFiNE Sync to collaborate with others`
       */
     ["com.affine.settings.member-tooltip"](): string;
     /**
@@ -5891,6 +5914,324 @@ export function useAFFiNEI18N(): {
       * `You can view current workspace's information here.`
       */
     ["com.affine.settings.workspace.description"](): string;
+    /**
+      * `AI BYOK (Beta)`
+      */
+    ["com.affine.settings.workspace.byok.title-beta"](): string;
+    /**
+      * `AI BYOK`
+      */
+    ["com.affine.settings.workspace.byok.title"](): string;
+    /**
+      * `Loading provider keys.`
+      */
+    ["com.affine.settings.workspace.byok.loading"](): string;
+    /**
+      * `Use your own provider keys for this workspace.`
+      */
+    ["com.affine.settings.workspace.byok.subtitle"](): string;
+    /**
+      * `Use workspace provider keys before AFFiNE AI plan routes.`
+      */
+    ["com.affine.settings.workspace.byok.header"](): string;
+    /**
+      * `BYOK requires Pro, Team, or Believer`
+      */
+    ["com.affine.settings.workspace.byok.locked.title"](): string;
+    /**
+      * `Upgrade this workspace to add provider keys and route AFFiNE AI through your own OpenAI, Anthropic, Gemini, or FAL account.`
+      */
+    ["com.affine.settings.workspace.byok.locked.description"](): string;
+    /**
+      * `AI plan stays available`
+      */
+    ["com.affine.settings.workspace.byok.notice.title"](): string;
+    /**
+      * `Local keys on this device are tried first. Workspace server keys follow, then AFFiNE AI plan routes when quota is available.`
+      */
+    ["com.affine.settings.workspace.byok.notice.description"](): string;
+    /**
+      * `Provider keys`
+      */
+    ["com.affine.settings.workspace.byok.keys.title"](): string;
+    /**
+      * `List order controls fallback within each storage group.`
+      */
+    ["com.affine.settings.workspace.byok.keys.description"](): string;
+    /**
+      * `No provider keys`
+      */
+    ["com.affine.settings.workspace.byok.empty.title"](): string;
+    /**
+      * `Add a key to create the first route for this workspace. Provider rows are not shown until a key exists.`
+      */
+    ["com.affine.settings.workspace.byok.empty.description"](): string;
+    /**
+      * `Local`
+      */
+    ["com.affine.settings.workspace.byok.storage.local"](): string;
+    /**
+      * `Server`
+      */
+    ["com.affine.settings.workspace.byok.storage.server"](): string;
+    /**
+      * `Local (this device)`
+      */
+    ["com.affine.settings.workspace.byok.storage.local-this-device"](): string;
+    /**
+      * `Local (Desktop only)`
+      */
+    ["com.affine.settings.workspace.byok.storage.local-desktop-only"](): string;
+    /**
+      * `Disabled after failure`
+      */
+    ["com.affine.settings.workspace.byok.status.disabled-after-failure"](): string;
+    /**
+      * `Key verified`
+      */
+    ["com.affine.settings.workspace.byok.status.key-verified"](): string;
+    /**
+      * `Key test failed`
+      */
+    ["com.affine.settings.workspace.byok.status.key-test-failed"](): string;
+    /**
+      * `Text`
+      */
+    ["com.affine.settings.workspace.byok.capability.text"](): string;
+    /**
+      * `Image input`
+      */
+    ["com.affine.settings.workspace.byok.capability.image-input"](): string;
+    /**
+      * `Actions`
+      */
+    ["com.affine.settings.workspace.byok.capability.actions"](): string;
+    /**
+      * `Image generate`
+      */
+    ["com.affine.settings.workspace.byok.capability.image-generate"](): string;
+    /**
+      * `Transcript`
+      */
+    ["com.affine.settings.workspace.byok.capability.transcript"](): string;
+    /**
+      * `Indexing`
+      */
+    ["com.affine.settings.workspace.byok.capability.indexing"](): string;
+    /**
+      * `failed {{date}}`
+      */
+    ["com.affine.settings.workspace.byok.row.activity.failed"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `used {{date}}`
+      */
+    ["com.affine.settings.workspace.byok.row.activity.used"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `used today`
+      */
+    ["com.affine.settings.workspace.byok.row.activity.used-today"](): string;
+    /**
+      * `not used yet`
+      */
+    ["com.affine.settings.workspace.byok.row.activity.unused"](): string;
+    /**
+      * `Feature coverage`
+      */
+    ["com.affine.settings.workspace.byok.coverage.title"](): string;
+    /**
+      * `Writing and chat`
+      */
+    ["com.affine.settings.workspace.byok.feature.chat.title"](): string;
+    /**
+      * `Covered when an OpenAI, Anthropic, or Gemini BYOK key exists.`
+      */
+    ["com.affine.settings.workspace.byok.feature.chat.fallback"](): string;
+    /**
+      * `Actions and structured output`
+      */
+    ["com.affine.settings.workspace.byok.feature.action.title"](): string;
+    /**
+      * `Covered when an OpenAI or Gemini BYOK key exists.`
+      */
+    ["com.affine.settings.workspace.byok.feature.action.fallback"](): string;
+    /**
+      * `Image generation`
+      */
+    ["com.affine.settings.workspace.byok.feature.image.title"](): string;
+    /**
+      * `Covered when an OpenAI, Gemini, or FAL BYOK key exists.`
+      */
+    ["com.affine.settings.workspace.byok.feature.image.fallback"](): string;
+    /**
+      * `Transcript`
+      */
+    ["com.affine.settings.workspace.byok.feature.transcript.title"](): string;
+    /**
+      * `Covered when a server Gemini BYOK key exists.`
+      */
+    ["com.affine.settings.workspace.byok.feature.transcript.fallback"](): string;
+    /**
+      * `Workspace indexing`
+      */
+    ["com.affine.settings.workspace.byok.feature.workspace-indexing.title"](): string;
+    /**
+      * `Covered when a server Gemini BYOK key exists.`
+      */
+    ["com.affine.settings.workspace.byok.feature.workspace-indexing.fallback"](): string;
+    /**
+      * `Transcript and workspace indexing require a server Gemini BYOK key or AFFiNE AI plan fallback.`
+      */
+    ["com.affine.settings.workspace.byok.warning.transcript"](): string;
+    /**
+      * `Workspace indexing requires a server Gemini BYOK key or AFFiNE AI plan fallback.`
+      */
+    ["com.affine.settings.workspace.byok.warning.workspace-indexing"](): string;
+    /**
+      * `BYOK usage`
+      */
+    ["com.affine.settings.workspace.byok.usage.title"](): string;
+    /**
+      * `Last 30 days`
+      */
+    ["com.affine.settings.workspace.byok.usage.period"](): string;
+    /**
+      * `{{count}} tokens`
+      */
+    ["com.affine.settings.workspace.byok.usage.tokens"](options: {
+        readonly count: string;
+    }): string;
+    /**
+      * `Add provider key`
+      */
+    ["com.affine.settings.workspace.byok.modal.add-title"](): string;
+    /**
+      * `Edit provider key`
+      */
+    ["com.affine.settings.workspace.byok.modal.edit-title"](): string;
+    /**
+      * `Re-enter the API key and test it before saving changes.`
+      */
+    ["com.affine.settings.workspace.byok.modal.description"](): string;
+    /**
+      * `Provider`
+      */
+    ["com.affine.settings.workspace.byok.field.provider"](): string;
+    /**
+      * `Key name`
+      */
+    ["com.affine.settings.workspace.byok.field.key-name"](): string;
+    /**
+      * `Description`
+      */
+    ["com.affine.settings.workspace.byok.field.description"](): string;
+    /**
+      * `Key storage`
+      */
+    ["com.affine.settings.workspace.byok.field.storage"](): string;
+    /**
+      * `API key`
+      */
+    ["com.affine.settings.workspace.byok.field.api-key"](): string;
+    /**
+      * `Endpoint`
+      */
+    ["com.affine.settings.workspace.byok.field.endpoint"](): string;
+    /**
+      * `Custom endpoints are disabled by the server administrator. In Self-hosted Admin, enable copilot.byok.allowCustomEndpoint.`
+      */
+    ["com.affine.settings.workspace.byok.endpoint.custom-disabled"](): string;
+    /**
+      * `Private network endpoints additionally require the server administrator to enable copilot.byok.allowPrivateEndpoint.`
+      */
+    ["com.affine.settings.workspace.byok.endpoint.private-disabled"](): string;
+    /**
+      * `Primary`
+      */
+    ["com.affine.settings.workspace.byok.placeholder.key-name"](): string;
+    /**
+      * `Workspace fallback key`
+      */
+    ["com.affine.settings.workspace.byok.placeholder.description"](): string;
+    /**
+      * `Add key`
+      */
+    ["com.affine.settings.workspace.byok.action.add-key"](): string;
+    /**
+      * `Test key`
+      */
+    ["com.affine.settings.workspace.byok.action.test-key"](): string;
+    /**
+      * `Cancel`
+      */
+    ["com.affine.settings.workspace.byok.action.cancel"](): string;
+    /**
+      * `Save key`
+      */
+    ["com.affine.settings.workspace.byok.action.save-key"](): string;
+    /**
+      * `Clear all BYOK keys`
+      */
+    ["com.affine.settings.workspace.byok.action.clear-all"](): string;
+    /**
+      * `Reorder`
+      */
+    ["com.affine.settings.workspace.byok.action.reorder"](): string;
+    /**
+      * `Edit`
+      */
+    ["com.affine.settings.workspace.byok.action.edit"](): string;
+    /**
+      * `Delete`
+      */
+    ["com.affine.settings.workspace.byok.action.delete"](): string;
+    /**
+      * `Key test failed`
+      */
+    ["com.affine.settings.workspace.byok.notify.test-failed.title"](): string;
+    /**
+      * `Local key not saved`
+      */
+    ["com.affine.settings.workspace.byok.notify.local-save-failed.title"](): string;
+    /**
+      * `Secure device storage is unavailable.`
+      */
+    ["com.affine.settings.workspace.byok.notify.local-save-failed.message"](): string;
+    /**
+      * `BYOK settings not loaded`
+      */
+    ["com.affine.settings.workspace.byok.notify.load-failed.title"](): string;
+    /**
+      * `BYOK key not saved`
+      */
+    ["com.affine.settings.workspace.byok.notify.save-failed.title"](): string;
+    /**
+      * `BYOK key not deleted`
+      */
+    ["com.affine.settings.workspace.byok.notify.delete-failed.title"](): string;
+    /**
+      * `BYOK keys not reordered`
+      */
+    ["com.affine.settings.workspace.byok.notify.reorder-failed.title"](): string;
+    /**
+      * `BYOK keys not cleared`
+      */
+    ["com.affine.settings.workspace.byok.notify.clear-failed.title"](): string;
+    /**
+      * `Please try again.`
+      */
+    ["com.affine.settings.workspace.byok.notify.operation-failed.message"](): string;
+    /**
+      * `Cannot reorder across storage`
+      */
+    ["com.affine.settings.workspace.byok.notify.cross-storage-reorder.title"](): string;
+    /**
+      * `Local keys and server keys keep separate fallback order.`
+      */
+    ["com.affine.settings.workspace.byok.notify.cross-storage-reorder.message"](): string;
     /**
       * `Experimental features`
       */
@@ -6293,9 +6634,9 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.workspace.license.benefit.team.g6"](): string;
     /**
-      * `Lean more`
+      * `Learn more`
       */
-    ["com.affine.settings.workspace.license.lean-more"](): string;
+    ["com.affine.settings.workspace.license.learn-more"](): string;
     /**
       * `Selfhosted workspace`
       */
@@ -6490,7 +6831,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.workspace.storage.subtitle"](): string;
     /**
-      * `Enable AFFiNE Cloud to publish this workspace`
+      * `Enable AFFiNE Sync to publish this workspace`
       */
     ["com.affine.settings.workspace.publish-tooltip"](): string;
     /**
@@ -6661,7 +7002,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.settings.workspace.indexer-embedding.embedding.additional-attachments.remove-attachment.tooltip"](): string;
     /**
-      * `Sharing doc requires AFFiNE Cloud.`
+      * `Sharing docs requires AFFiNE Sync.`
       */
     ["com.affine.share-menu.EnableCloudDescription"](): string;
     /**
@@ -7014,7 +7355,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.storage.plan"](): string;
     /**
-      * `AFFiNE Cloud storage`
+      * `AFFiNE Sync storage`
       */
     ["com.affine.storage.title"](): string;
     /**
@@ -7266,7 +7607,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.user-info.usage.ai"](): string;
     /**
-      * `Cloud storage`
+      * `Sync storage`
       */
     ["com.affine.user-info.usage.cloud"](): string;
     /**
@@ -7302,7 +7643,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.workspace.cannot-delete"](): string;
     /**
-      * `Cloud workspaces`
+      * `Synced workspaces`
       */
     ["com.affine.workspace.cloud"](): string;
     /**
@@ -7338,11 +7679,11 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.workspace.cloud.account.team.tips-2"](): string;
     /**
-      * `Sign up/ Sign in`
+      * `Sign in / Sign up to AFFiNE`
       */
     ["com.affine.workspace.cloud.auth"](): string;
     /**
-      * `Sync with AFFiNE Cloud`
+      * `Sync with AFFiNE`
       */
     ["com.affine.workspace.cloud.description"](): string;
     /**
@@ -7350,11 +7691,11 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.workspace.cloud.join"](): string;
     /**
-      * `Cloud sync`
+      * `AFFiNE Sync`
       */
     ["com.affine.workspace.cloud.sync"](): string;
     /**
-      * `Failed to enable Cloud, please try again.`
+      * `Failed to turn on AFFiNE Sync. Please try again.`
       */
     ["com.affine.workspace.enable-cloud.failed"](): string;
     /**
@@ -7386,7 +7727,7 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.workspaceList.addWorkspace.create"](): string;
     /**
-      * `Create cloud workspace`
+      * `Create synced workspace`
       */
     ["com.affine.workspaceList.addWorkspace.create-cloud"](): string;
     /**
@@ -8550,6 +8891,196 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.integration.mcp-server.copy-json.disabled-hint"](): string;
     /**
+      * `Credentials`
+      */
+    ["com.affine.integration.mcp-server.credentials.title"](): string;
+    /**
+      * `Use a separate credential for each MCP client so it can be revoked independently.`
+      */
+    ["com.affine.integration.mcp-server.credentials.description"](): string;
+    /**
+      * `Create credential`
+      */
+    ["com.affine.integration.mcp-server.action.create"](): string;
+    /**
+      * `Rotate`
+      */
+    ["com.affine.integration.mcp-server.action.rotate"](): string;
+    /**
+      * `Revoke credential`
+      */
+    ["com.affine.integration.mcp-server.action.revoke"](): string;
+    /**
+      * `Copy token`
+      */
+    ["com.affine.integration.mcp-server.action.copy-token"](): string;
+    /**
+      * `Copy JSON`
+      */
+    ["com.affine.integration.mcp-server.action.copy-json"](): string;
+    /**
+      * `Done`
+      */
+    ["com.affine.integration.mcp-server.action.done"](): string;
+    /**
+      * `Failed to load MCP credentials.`
+      */
+    ["com.affine.integration.mcp-server.load-error"](): string;
+    /**
+      * `No MCP credentials`
+      */
+    ["com.affine.integration.mcp-server.empty.title"](): string;
+    /**
+      * `Create a workspace-bound credential to connect an MCP client.`
+      */
+    ["com.affine.integration.mcp-server.empty.description"](): string;
+    /**
+      * `Read only`
+      */
+    ["com.affine.integration.mcp-server.access.read-only"](): string;
+    /**
+      * `Can read and search documents in this workspace using your current permissions.`
+      */
+    ["com.affine.integration.mcp-server.access.read-only-desc"](): string;
+    /**
+      * `Read and write`
+      */
+    ["com.affine.integration.mcp-server.access.read-write"](): string;
+    /**
+      * `Expires {{date}}`
+      */
+    ["com.affine.integration.mcp-server.meta.expires"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `Created {{date}}`
+      */
+    ["com.affine.integration.mcp-server.meta.created"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `Last used {{date}}`
+      */
+    ["com.affine.integration.mcp-server.meta.last-used"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `Never used`
+      */
+    ["com.affine.integration.mcp-server.meta.never-used"](): string;
+    /**
+      * `Old token valid until {{date}}`
+      */
+    ["com.affine.integration.mcp-server.meta.grace-until"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `Active`
+      */
+    ["com.affine.integration.mcp-server.status.active"](): string;
+    /**
+      * `Rotating`
+      */
+    ["com.affine.integration.mcp-server.status.rotating"](): string;
+    /**
+      * `Expiring`
+      */
+    ["com.affine.integration.mcp-server.status.expiring"](): string;
+    /**
+      * `Expired`
+      */
+    ["com.affine.integration.mcp-server.status.expired"](): string;
+    /**
+      * `Revoked`
+      */
+    ["com.affine.integration.mcp-server.status.revoked"](): string;
+    /**
+      * `Create MCP credential`
+      */
+    ["com.affine.integration.mcp-server.create.title"](): string;
+    /**
+      * `This credential will only work with this workspace's MCP endpoint.`
+      */
+    ["com.affine.integration.mcp-server.create.description"](): string;
+    /**
+      * `Label`
+      */
+    ["com.affine.integration.mcp-server.field.label"](): string;
+    /**
+      * `Access`
+      */
+    ["com.affine.integration.mcp-server.field.access"](): string;
+    /**
+      * `Expires in`
+      */
+    ["com.affine.integration.mcp-server.field.expiry"](): string;
+    /**
+      * `{{days}} days`
+      */
+    ["com.affine.integration.mcp-server.expiry.days"](options: {
+        readonly days: string;
+    }): string;
+    /**
+      * `MCP credential created`
+      */
+    ["com.affine.integration.mcp-server.reveal.title"](): string;
+    /**
+      * `Copy this credential now. You won’t be able to see it again.`
+      */
+    ["com.affine.integration.mcp-server.reveal.warning"](): string;
+    /**
+      * `The old token remains valid until {{date}}.`
+      */
+    ["com.affine.integration.mcp-server.reveal.old-valid-until"](options: {
+        readonly date: string;
+    }): string;
+    /**
+      * `Credential`
+      */
+    ["com.affine.integration.mcp-server.reveal.token"](): string;
+    /**
+      * `MCP configuration`
+      */
+    ["com.affine.integration.mcp-server.reveal.config"](): string;
+    /**
+      * `Rotate this credential?`
+      */
+    ["com.affine.integration.mcp-server.rotate.title"](): string;
+    /**
+      * `A new token will be created immediately. The old token remains valid for up to 24 hours so you can update the MCP client.`
+      */
+    ["com.affine.integration.mcp-server.rotate.description"](): string;
+    /**
+      * `Revoke “{{name}}”?`
+      */
+    ["com.affine.integration.mcp-server.revoke.title"](options: {
+        readonly name: string;
+    }): string;
+    /**
+      * `All generations of this credential will stop working immediately. This cannot be undone.`
+      */
+    ["com.affine.integration.mcp-server.revoke.description"](): string;
+    /**
+      * `Supported capabilities`
+      */
+    ["com.affine.integration.mcp-server.capabilities.title"](): string;
+    /**
+      * `Read documents`
+      */
+    ["com.affine.integration.mcp-server.capabilities.read"](): string;
+    /**
+      * `Keyword search`
+      */
+    ["com.affine.integration.mcp-server.capabilities.keyword-search"](): string;
+    /**
+      * `Semantic search`
+      */
+    ["com.affine.integration.mcp-server.capabilities.semantic-search"](): string;
+    /**
+      * `Create and update documents`
+      */
+    ["com.affine.integration.mcp-server.capabilities.write"](): string;
+    /**
       * `Notes`
       */
     ["com.affine.audio.notes"](): string;
@@ -8704,6 +9235,66 @@ export function useAFFiNEI18N(): {
       */
     ["com.affine.docIconPicker.placeholder"](): string;
     /**
+      * `Devices`
+      */
+    ["com.affine.settings.devices.title"](): string;
+    /**
+      * `Devices with an active sign-in session`
+      */
+    ["com.affine.settings.devices.description"](): string;
+    /**
+      * `current`
+      */
+    ["com.affine.settings.devices.current"](): string;
+    /**
+      * `Last used {{time}}`
+      */
+    ["com.affine.settings.devices.last-used"](options: {
+        readonly time: string;
+    }): string;
+    /**
+      * `Loading…`
+      */
+    ["com.affine.settings.devices.loading"](): string;
+    /**
+      * `Sign out`
+      */
+    ["com.affine.settings.devices.sign-out"](): string;
+    /**
+      * `Sign out all devices`
+      */
+    ["com.affine.settings.devices.sign-out-all"](): string;
+    /**
+      * `Sign out {{device}}?`
+      */
+    ["com.affine.settings.devices.confirm"](options: {
+        readonly device: string;
+    }): string;
+    /**
+      * `Sign out every device?`
+      */
+    ["com.affine.settings.devices.confirm-all"](): string;
+    /**
+      * `Failed to load devices`
+      */
+    ["com.affine.settings.devices.load-failed"](): string;
+    /**
+      * `Failed to sign out device`
+      */
+    ["com.affine.settings.devices.sign-out-failed"](): string;
+    /**
+      * `Failed to sign out devices`
+      */
+    ["com.affine.settings.devices.sign-out-all-failed"](): string;
+    /**
+      * `Real-time connection failed`
+      */
+    ["com.affine.realtime.connection-error.title"](): string;
+    /**
+      * `Check that your server proxy forwards /socket.io over WebSocket or HTTP polling.`
+      */
+    ["com.affine.realtime.connection-error.message"](): string;
+    /**
       * `An internal error occurred.`
       */
     ["error.INTERNAL_SERVER_ERROR"](): string;
@@ -8737,9 +9328,11 @@ export function useAFFiNEI18N(): {
         readonly message: string;
     }): string;
     /**
-      * `Invalid URL`
+      * `URL blocked by SSRF protection: {{reason}}`
       */
-    ["error.SSRF_BLOCKED_ERROR"](): string;
+    ["error.SSRF_BLOCKED_ERROR"](options: {
+        readonly reason: string;
+    }): string;
     /**
       * `Response too large ({{receivedBytes}} bytes), limit is {{limitBytes}} bytes`
       */
@@ -8873,6 +9466,34 @@ export function useAFFiNEI18N(): {
       * `You must sign in first to access this resource.`
       */
     ["error.AUTHENTICATION_REQUIRED"](): string;
+    /**
+      * `The access token has expired.`
+      */
+    ["error.ACCESS_TOKEN_EXPIRED"](): string;
+    /**
+      * `The access token is invalid.`
+      */
+    ["error.ACCESS_TOKEN_INVALID"](): string;
+    /**
+      * `The auth session has expired.`
+      */
+    ["error.AUTH_SESSION_EXPIRED"](): string;
+    /**
+      * `The auth session has been revoked.`
+      */
+    ["error.AUTH_SESSION_REVOKED"](): string;
+    /**
+      * `The refresh token is invalid.`
+      */
+    ["error.REFRESH_TOKEN_INVALID"](): string;
+    /**
+      * `The refresh token has already been used.`
+      */
+    ["error.REFRESH_TOKEN_REUSED"](): string;
+    /**
+      * `Auth session service is temporarily unavailable.`
+      */
+    ["error.AUTH_SESSION_TEMPORARILY_UNAVAILABLE"](): string;
     /**
       * `You are not allowed to perform this action.`
       */
@@ -9368,6 +9989,12 @@ export function useAFFiNEI18N(): {
         requiredVersion: string;
     }>): string;
     /**
+      * `This AFFiNE server is too old for this client. Please upgrade the server to {{requiredVersion}}.`
+      */
+    ["error.UNSUPPORTED_SERVER_VERSION"](options: {
+        readonly requiredVersion: string;
+    }): string;
+    /**
       * `Notification not found.`
       */
     ["error.NOTIFICATION_NOT_FOUND"](): string;
@@ -9473,7 +10100,7 @@ export const TypedTrans: {
         ["1"]: JSX.Element;
     }>>;
     /**
-      * `The Self-Hosted instance is not hosted or deployed by AFFiNE. Your data will be stored on these instances.  <1>Learn more about Self-Host details.</1>`
+      * `This is an AFFiNE server hosted by you or your team. After signing in, workspace data is saved to the AFFiNE server you enter, not to AFFiNE Cloud. <1>Learn more about self-hosting.</1>`
       */
     ["com.affine.auth.sign.add-selfhosted.description"]: ComponentType<TypedTransProps<Readonly<{}>, {
         ["1"]: JSX.Element;
@@ -9743,7 +10370,7 @@ export const TypedTrans: {
         ["1"]: JSX.Element;
     }>>;
     /**
-      * `Your account will be inaccessible, and your personal cloud space will be permanently deleted. You can remove local data by uninstalling the app or clearing your browser storage. <1>This action is irreversible.</1>`
+      * `Your account will be inaccessible, and your personal space on the server will be permanently deleted. You can remove local data by uninstalling the app or clearing your browser storage. <1>This action is irreversible.</1>`
       */
     ["com.affine.setting.account.delete.confirm-delete-description-2"]: ComponentType<TypedTransProps<Readonly<{}>, {
         ["1"]: JSX.Element;
@@ -9889,7 +10516,7 @@ export const TypedTrans: {
         ["1"]: JSX.Element;
     }>>;
     /**
-      * `Deleting <1>{{workspace}}</1> will delete both local and cloud data, this operation cannot be undone, please proceed with caution.`
+      * `Deleting <1>{{workspace}}</1> will delete both local data and synced server data. This cannot be undone, so please proceed with caution.`
       */
     ["com.affine.workspaceDelete.description2"]: ComponentType<TypedTransProps<{
         readonly workspace: string;

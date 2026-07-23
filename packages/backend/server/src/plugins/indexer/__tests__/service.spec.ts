@@ -1887,12 +1887,9 @@ test('should delete doc work', async t => {
   t.is(result4.nodes.length, 1);
   t.deepEqual(result4.nodes[0].fields.docId, [docId2]);
 
-  const count = module.queue.count('copilot.embedding.deleteDoc');
-
   await indexerService.deleteDoc(workspaceId, docId1, {
     refresh: true,
   });
-  t.is(module.queue.count('copilot.embedding.deleteDoc'), count + 1);
 
   // make sure the docId1 is deleted
   result1 = await indexerService.search({
@@ -2310,6 +2307,67 @@ test('should search docs by keyword work', async t => {
         ])
       )
       .sort((a, b) => a.blockId.localeCompare(b.blockId))
+  );
+});
+
+test('should search docs by keyword with doc id filter', async t => {
+  const workspaceId = workspace.id;
+  const docId1 = randomUUID();
+  const docId2 = randomUUID();
+
+  await module.create(Mockers.DocMeta, {
+    workspaceId,
+    docId: docId1,
+    title: 'hello filtered 1',
+  });
+  await module.create(Mockers.DocMeta, {
+    workspaceId,
+    docId: docId2,
+    title: 'hello filtered 2',
+  });
+
+  await indexerService.write(
+    SearchTable.block,
+    [
+      {
+        workspaceId,
+        docId: docId1,
+        blockId: 'filtered-block1',
+        content: 'hello filtered',
+        flavour: 'affine:text',
+        createdByUserId: user.id,
+        updatedByUserId: user.id,
+        createdAt: new Date('2025-06-20T00:00:00.000Z'),
+        updatedAt: new Date('2025-06-20T00:00:00.000Z'),
+      },
+      {
+        workspaceId,
+        docId: docId2,
+        blockId: 'filtered-block2',
+        content: 'hello filtered',
+        flavour: 'affine:text',
+        createdByUserId: user.id,
+        updatedByUserId: user.id,
+        createdAt: new Date('2025-06-20T00:00:01.000Z'),
+        updatedAt: new Date('2025-06-20T00:00:01.000Z'),
+      },
+    ],
+    {
+      refresh: true,
+    }
+  );
+
+  const rows = await indexerService.searchDocsByKeyword(
+    workspaceId,
+    'hello filtered',
+    {
+      docIds: [docId2],
+    }
+  );
+
+  t.deepEqual(
+    rows.map(row => row.docId),
+    [docId2]
   );
 });
 

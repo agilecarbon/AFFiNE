@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { PrismaClient } from '@prisma/client';
 import ava, { TestFn } from 'ava';
 import Sinon from 'sinon';
 
@@ -8,36 +9,65 @@ import {
   type TestingModule,
 } from '../../../__tests__/utils';
 import {
-  DocActionDenied,
-  OwnerCanNotLeaveWorkspace,
-  SpaceAccessDenied,
-} from '../../../base';
-import {
   Models,
   User,
   Workspace,
   WorkspaceMemberStatus,
   WorkspaceRole,
 } from '../../../models';
-import { QuotaService } from '../../quota/service';
 import { QuotaServiceModule } from '../../quota/service.module';
+import { QuotaStateService } from '../../quota/state';
 import { PermissionModule } from '../index';
 import { WorkspacePolicyService } from '../policy';
 
 interface Context {
   module: TestingModule;
+  db: PrismaClient;
   models: Models;
   policy: WorkspacePolicyService;
 }
 
 const test = ava as TestFn<Context>;
 
-const READONLY_FEATURE = 'quota_exceeded_readonly_workspace_v1' as const;
 type WorkspaceQuotaSnapshot = Awaited<
-  ReturnType<QuotaService['getWorkspaceQuotaWithUsage']>
+  ReturnType<QuotaStateService['reconcileWorkspaceQuotaState']>
 > & {
-  ownerQuota?: string;
+  readonlyReasons: string[];
 };
+
+const readonlyWorkspaceState = (
+  workspaceId: string,
+  readonlyReasons: string[],
+  overrides: Partial<WorkspaceQuotaSnapshot> = {}
+) =>
+  ({
+    workspaceId,
+    plan: 'free',
+    sourceEntitlementId: null,
+    ownerUserId: owner.id,
+    usesOwnerQuota: true,
+    seatLimit: 3,
+    memberCount: 1,
+    overcapacityMemberCount: readonlyReasons.includes('member_overflow')
+      ? 1
+      : 0,
+    blobLimit: BigInt(1),
+    storageQuota: BigInt(1),
+    usedStorageQuota: readonlyReasons.includes('storage_overflow')
+      ? BigInt(2)
+      : BigInt(0),
+    historyPeriodSeconds: 1,
+    readonly: readonlyReasons.length > 0,
+    readonlyReasons,
+    flags: {},
+    known: true,
+    stale: false,
+    lastReconciledAt: new Date(),
+    staleAfter: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...overrides,
+  }) satisfies WorkspaceQuotaSnapshot;
 async function addAcceptedMembers(
   models: Models,
   workspaceId: string,
@@ -64,6 +94,7 @@ let workspace: Workspace;
 test.before(async t => {
   const module = await createTestingModule({ imports: [PermissionModule] });
   t.context.module = module;
+  t.context.db = module.get(PrismaClient);
   t.context.models = module.get(Models);
   t.context.policy = module.get(WorkspacePolicyService);
 });
@@ -81,21 +112,23 @@ test.after.always(async t => {
   await t.context.module.close();
 });
 
-test('should reuse quota service exported by quota service module', async t => {
+test('should reuse quota state service exported by quota service module', async t => {
   const module = await createTestingModule(
     { imports: [PermissionModule, QuotaServiceModule] },
     false
   );
 
   try {
-    const quota = module.select(QuotaServiceModule).get(QuotaService, {
-      strict: true,
-    });
+    const quotaState = module
+      .select(QuotaServiceModule)
+      .get(QuotaStateService, {
+        strict: true,
+      });
     const policy = module.select(PermissionModule).get(WorkspacePolicyService, {
       strict: true,
     });
 
-    t.is(Reflect.get(policy, 'quota'), quota);
+    t.is(Reflect.get(policy, 'quotaState'), quotaState);
   } finally {
     await module.close();
   }
@@ -105,15 +138,27 @@ test('should keep owned workspace writable when quota is within limit', async t 
   const state = await t.context.policy.reconcileWorkspaceQuotaState(
     workspace.id
   );
+  const quotaState = Reflect.get(
+    t.context.policy,
+    'quotaState'
+  ) as QuotaStateService;
+  const reconcile = Sinon.spy(quotaState, 'reconcileWorkspaceQuotaState');
 
   t.false(state.isReadonly);
   t.deepEqual(state.readonlyReasons, []);
-  t.false(
-    await t.context.models.workspaceFeature.has(workspace.id, READONLY_FEATURE)
-  );
+
+  await t.context.policy.getWorkspaceState(workspace.id);
+  t.is(reconcile.callCount, 0);
+
+  await t.context.db.effectiveWorkspaceQuotaState.update({
+    where: { workspaceId: workspace.id },
+    data: { stale: true },
+  });
+  await t.context.policy.getWorkspaceState(workspace.id);
+  t.is(reconcile.callCount, 1);
 });
 
-test('should enter readonly mode when fallback owner member quota overflows', async t => {
+test('should report readonly state when fallback owner member quota overflows', async t => {
   await addAcceptedMembers(t.context.models, workspace.id, 10);
 
   const state = await t.context.policy.reconcileWorkspaceQuotaState(
@@ -124,91 +169,16 @@ test('should enter readonly mode when fallback owner member quota overflows', as
   t.true(state.canRecoverByRemovingMembers);
   t.false(state.canRecoverByDeletingBlobs);
   t.deepEqual(state.readonlyReasons, ['member_overflow']);
-  t.true(
-    await t.context.models.workspaceFeature.has(workspace.id, READONLY_FEATURE)
-  );
-  await t.throwsAsync(t.context.policy.assertCanInviteMembers(workspace.id), {
-    instanceOf: SpaceAccessDenied,
-  });
-});
-
-test('should deny blob uploads when user no longer has write access', async t => {
-  const external = await t.context.models.user.create({
-    email: `${randomUUID()}@affine.pro`,
-  });
-  await t.context.models.workspaceUser.set(
-    workspace.id,
-    external.id,
-    WorkspaceRole.External,
-    { status: WorkspaceMemberStatus.Accepted }
-  );
-
-  await t.throwsAsync(
-    t.context.policy.assertCanUploadBlob(external.id, workspace.id),
-    { instanceOf: SpaceAccessDenied }
-  );
-});
-
-test('should deny publish through policy when workspace sharing is disabled', async t => {
-  await t.context.models.workspace.update(workspace.id, {
-    enableSharing: false,
-  });
-
-  await t.throwsAsync(
-    t.context.policy.assertCanPublishDoc(owner.id, workspace.id, 'doc1'),
-    { instanceOf: DocActionDenied }
-  );
-  await t.notThrowsAsync(
-    t.context.policy.assertCanUnpublishDoc(owner.id, workspace.id, 'doc1')
-  );
-});
-
-test('should allow managers to revoke invite links in readonly workspace', async t => {
-  await addAcceptedMembers(t.context.models, workspace.id, 10);
-  await t.context.policy.reconcileWorkspaceQuotaState(workspace.id);
-
-  await t.notThrowsAsync(
-    t.context.policy.assertCanManageInviteLink(owner.id, workspace.id)
-  );
-});
-
-test('should apply leave workspace policy by role', async t => {
-  const collaborator = await t.context.models.user.create({
-    email: `${randomUUID()}@affine.pro`,
-  });
-  await t.context.models.workspaceUser.set(
-    workspace.id,
-    collaborator.id,
-    WorkspaceRole.Collaborator,
-    { status: WorkspaceMemberStatus.Accepted }
-  );
-
-  await t.throwsAsync(
-    t.context.policy.assertCanLeaveWorkspace(owner.id, workspace.id),
-    { instanceOf: OwnerCanNotLeaveWorkspace }
-  );
-  await t.notThrowsAsync(
-    t.context.policy.assertCanLeaveWorkspace(collaborator.id, workspace.id)
-  );
 });
 
 test('should enter readonly mode when fallback owner storage quota overflows', async t => {
-  const quota = Sinon.stub(
-    Reflect.get(t.context.policy, 'quota') as QuotaService,
-    'getWorkspaceQuotaWithUsage'
+  const quotaState = Sinon.stub(
+    Reflect.get(t.context.policy, 'quotaState') as QuotaStateService,
+    'reconcileWorkspaceQuotaState'
   );
-  quota.resolves({
-    name: 'Free',
-    blobLimit: 1,
-    storageQuota: 1,
-    usedStorageQuota: 2,
-    historyPeriod: 1,
-    memberLimit: 3,
-    memberCount: 1,
-    overcapacityMemberCount: 0,
-    usedSize: 2,
-    ownerQuota: owner.id,
-  } satisfies WorkspaceQuotaSnapshot);
+  quotaState.callsFake(async workspaceId =>
+    readonlyWorkspaceState(workspaceId, ['storage_overflow'])
+  );
 
   const state = await t.context.policy.reconcileWorkspaceQuotaState(
     workspace.id
@@ -218,57 +188,26 @@ test('should enter readonly mode when fallback owner storage quota overflows', a
   t.false(state.canRecoverByRemovingMembers);
   t.true(state.canRecoverByDeletingBlobs);
   t.deepEqual(state.readonlyReasons, ['storage_overflow']);
-  t.true(
-    await t.context.models.workspaceFeature.has(workspace.id, READONLY_FEATURE)
-  );
 });
 
-test('should leave readonly mode after workspace usage recovers', async t => {
-  const quota = Sinon.stub(
-    Reflect.get(t.context.policy, 'quota') as QuotaService,
-    'getWorkspaceQuotaWithUsage'
+test('should report recovered state after workspace usage recovers', async t => {
+  const quotaState = Sinon.stub(
+    Reflect.get(t.context.policy, 'quotaState') as QuotaStateService,
+    'reconcileWorkspaceQuotaState'
   );
-  quota.onFirstCall().resolves({
-    name: 'Free',
-    blobLimit: 1,
-    storageQuota: 1,
-    usedStorageQuota: 2,
-    historyPeriod: 1,
-    memberLimit: 3,
-    memberCount: 1,
-    overcapacityMemberCount: 0,
-    usedSize: 2,
-    ownerQuota: owner.id,
-  } satisfies WorkspaceQuotaSnapshot);
-  quota.onSecondCall().resolves({
-    name: 'Free',
-    blobLimit: 1,
-    storageQuota: 1,
-    usedStorageQuota: 0,
-    historyPeriod: 1,
-    memberLimit: 3,
-    memberCount: 1,
-    overcapacityMemberCount: 0,
-    usedSize: 0,
-    ownerQuota: owner.id,
-  } satisfies WorkspaceQuotaSnapshot);
-  quota.onThirdCall().resolves({
-    name: 'Free',
-    blobLimit: 1,
-    storageQuota: 1,
-    usedStorageQuota: 0,
-    historyPeriod: 1,
-    memberLimit: 3,
-    memberCount: 1,
-    overcapacityMemberCount: 0,
-    usedSize: 0,
-    ownerQuota: owner.id,
-  } satisfies WorkspaceQuotaSnapshot);
+  quotaState
+    .onFirstCall()
+    .callsFake(async workspaceId =>
+      readonlyWorkspaceState(workspaceId, ['storage_overflow'])
+    );
+  quotaState
+    .onSecondCall()
+    .callsFake(async workspaceId => readonlyWorkspaceState(workspaceId, []));
+  quotaState
+    .onThirdCall()
+    .callsFake(async workspaceId => readonlyWorkspaceState(workspaceId, []));
 
   await t.context.policy.reconcileWorkspaceQuotaState(workspace.id);
-  t.true(
-    await t.context.models.workspaceFeature.has(workspace.id, READONLY_FEATURE)
-  );
 
   const recovered = await t.context.policy.reconcileWorkspaceQuotaState(
     workspace.id
@@ -276,10 +215,6 @@ test('should leave readonly mode after workspace usage recovers', async t => {
 
   t.false(recovered.isReadonly);
   t.deepEqual(recovered.readonlyReasons, []);
-  t.false(
-    await t.context.models.workspaceFeature.has(workspace.id, READONLY_FEATURE)
-  );
-  await t.notThrowsAsync(t.context.policy.assertCanInviteMembers(workspace.id));
 });
 
 test('should roll back team cancellation cleanup when cleanup fails', async t => {
@@ -289,11 +224,15 @@ test('should roll back team cancellation cleanup when cleanup fails', async t =>
   const admin = await t.context.models.user.create({
     email: `${randomUUID()}@affine.pro`,
   });
-  await t.context.models.workspaceUser.set(
-    workspace.id,
-    pending.id,
-    WorkspaceRole.Collaborator
-  );
+  await t.context.db.workspaceInvitation.create({
+    data: {
+      workspaceId: workspace.id,
+      inviteeUserId: pending.id,
+      requestedRole: 'member',
+      status: 'pending',
+      kind: 'email',
+    },
+  });
   await t.context.models.workspaceUser.set(
     workspace.id,
     admin.id,
@@ -302,17 +241,10 @@ test('should roll back team cancellation cleanup when cleanup fails', async t =>
       status: WorkspaceMemberStatus.Accepted,
     }
   );
-  await t.context.models.workspaceFeature.add(
-    workspace.id,
-    'team_plan_v1',
-    'test team workspace',
-    {
-      memberLimit: 20,
-    }
-  );
-
   const failure = new Error('cleanup failed');
-  Sinon.stub(t.context.models.workspaceFeature, 'remove').rejects(failure);
+  Sinon.stub(t.context.models.workspaceUser, 'demoteAcceptedAdmins').rejects(
+    failure
+  );
 
   const error = await t.throwsAsync(
     t.context.policy.handleTeamPlanCanceled(workspace.id),
@@ -326,8 +258,5 @@ test('should roll back team cancellation cleanup when cleanup fails', async t =>
   t.is(
     (await t.context.models.workspaceUser.get(workspace.id, admin.id))?.type,
     WorkspaceRole.Admin
-  );
-  t.true(
-    await t.context.models.workspaceFeature.has(workspace.id, 'team_plan_v1')
   );
 });

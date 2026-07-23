@@ -365,6 +365,7 @@ export const PackageList = [
       'blocksuite/affine/gfx/pointer',
       'blocksuite/affine/gfx/shape',
       'blocksuite/affine/gfx/text',
+      'blocksuite/affine/inlines/latex',
       'blocksuite/affine/inlines/preset',
       'blocksuite/affine/model',
       'blocksuite/affine/rich-text',
@@ -682,6 +683,7 @@ export const PackageList = [
     location: 'blocksuite/affine/gfx/turbo-renderer',
     name: '@blocksuite/affine-gfx-turbo-renderer',
     workspaceDependencies: [
+      'blocksuite/affine/shared',
       'blocksuite/framework/global',
       'blocksuite/framework/std',
       'blocksuite/framework/store',
@@ -827,6 +829,7 @@ export const PackageList = [
       'blocksuite/affine/components',
       'blocksuite/affine/ext-loader',
       'blocksuite/affine/model',
+      'blocksuite/affine/rich-text',
       'blocksuite/affine/shared',
       'blocksuite/framework/global',
       'blocksuite/framework/std',
@@ -1046,6 +1049,11 @@ export const PackageList = [
     workspaceDependencies: [],
   },
   {
+    location: 'blocksuite/docs-site',
+    name: '@blocksuite/docs',
+    workspaceDependencies: ['blocksuite/affine/all'],
+  },
+  {
     location: 'blocksuite/framework/global',
     name: '@blocksuite/global',
     workspaceDependencies: [],
@@ -1106,7 +1114,13 @@ export const PackageList = [
       'tools/cli',
       'tools/utils',
       'packages/common/graphql',
+      'packages/common/realtime',
     ],
+  },
+  {
+    location: 'packages/common/auth',
+    name: '@affine/auth',
+    workspaceDependencies: [],
   },
   {
     location: 'packages/common/debug',
@@ -1143,6 +1157,7 @@ export const PackageList = [
     name: '@affine/nbstore',
     workspaceDependencies: [
       'packages/common/reader',
+      'packages/common/realtime',
       'packages/common/infra',
       'packages/common/error',
       'packages/common/graphql',
@@ -1153,6 +1168,11 @@ export const PackageList = [
     location: 'packages/common/reader',
     name: '@affine/reader',
     workspaceDependencies: ['blocksuite/affine/all'],
+  },
+  {
+    location: 'packages/common/realtime',
+    name: '@affine/realtime',
+    workspaceDependencies: ['packages/common/graphql'],
   },
   {
     location: 'packages/common/s3-compat',
@@ -1190,6 +1210,7 @@ export const PackageList = [
     name: '@affine/electron',
     workspaceDependencies: [
       'tools/utils',
+      'packages/common/auth',
       'packages/frontend/i18n',
       'packages/frontend/native',
       'packages/common/nbstore',
@@ -1289,6 +1310,7 @@ export const PackageList = [
       'blocksuite/affine/blocks/root',
       'blocksuite/affine/components',
       'blocksuite/affine/shared',
+      'blocksuite/affine/data-view',
       'blocksuite/framework/global',
       'blocksuite/framework/std',
       'packages/common/infra',
@@ -1308,11 +1330,6 @@ export const PackageList = [
       'tools/cli',
       'tools/utils',
     ],
-  },
-  {
-    location: 'packages/frontend/media-capture-playground',
-    name: '@affine/media-capture-playground',
-    workspaceDependencies: ['packages/frontend/native'],
   },
   {
     location: 'packages/frontend/native',
@@ -1502,6 +1519,7 @@ export type PackageName =
   | '@blocksuite/affine-widget-toolbar'
   | '@blocksuite/affine-widget-viewport-overlay'
   | '@blocksuite/bs-docs'
+  | '@blocksuite/docs'
   | '@blocksuite/global'
   | '@blocksuite/std'
   | '@blocksuite/store'
@@ -1511,6 +1529,7 @@ export type PackageName =
   | '@affine/docs'
   | '@affine/server-native'
   | '@affine/server'
+  | '@affine/auth'
   | '@affine/debug'
   | '@affine/env'
   | '@affine/error'
@@ -1518,6 +1537,7 @@ export type PackageName =
   | '@toeverything/infra'
   | '@affine/nbstore'
   | '@affine/reader'
+  | '@affine/realtime'
   | '@affine/s3-compat'
   | '@affine/admin'
   | '@affine/android'
@@ -1531,7 +1551,6 @@ export type PackageName =
   | '@affine/core'
   | '@affine/electron-api'
   | '@affine/i18n'
-  | '@affine/media-capture-playground'
   | '@affine/native'
   | '@affine/routes'
   | '@affine/templates'

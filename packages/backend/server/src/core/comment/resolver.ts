@@ -25,10 +25,13 @@ import {
 import { Comment, DocMode, Models, Reply } from '../../models';
 import { CurrentUser } from '../auth/session';
 import { ServerFeature, ServerService } from '../config';
-import { AccessController, DocAction } from '../permission';
+import { DocAction, PermissionAccess } from '../permission';
+import { QuotaService } from '../quota';
+import { RealtimePublisher } from '../realtime';
 import { CommentAttachmentStorage } from '../storage';
 import { UserType } from '../user';
 import { WorkspaceType } from '../workspaces';
+import { publishCommentChanged } from './realtime';
 import { CommentService } from './service';
 import {
   CommentCreateInput,
@@ -52,11 +55,13 @@ export interface CommentCursor {
 export class CommentResolver {
   constructor(
     private readonly service: CommentService,
-    private readonly ac: AccessController,
+    private readonly ac: PermissionAccess,
     private readonly commentAttachmentStorage: CommentAttachmentStorage,
+    private readonly quota: QuotaService,
     private readonly queue: JobQueue,
     private readonly models: Models,
-    private readonly server: ServerService
+    private readonly server: ServerService,
+    private readonly realtime: RealtimePublisher
   ) {
     // enable comment feature by default
     this.server.enableFeature(ServerFeature.Comment);
@@ -81,6 +86,7 @@ export class CommentResolver {
       input.docMode,
       input.mentions
     );
+    publishCommentChanged(this.realtime, comment.workspaceId, comment.docId);
 
     return {
       ...comment,
@@ -108,6 +114,7 @@ export class CommentResolver {
     await this.assertPermission(me, comment, 'Doc.Comments.Update');
 
     await this.service.updateComment(input);
+    publishCommentChanged(this.realtime, comment.workspaceId, comment.docId);
     return true;
   }
 
@@ -126,6 +133,7 @@ export class CommentResolver {
     await this.assertPermission(me, comment, 'Doc.Comments.Resolve');
 
     await this.service.resolveComment(input);
+    publishCommentChanged(this.realtime, comment.workspaceId, comment.docId);
     return true;
   }
 
@@ -141,6 +149,7 @@ export class CommentResolver {
     await this.assertPermission(me, comment, 'Doc.Comments.Delete');
 
     await this.service.deleteComment(id);
+    publishCommentChanged(this.realtime, comment.workspaceId, comment.docId);
     return true;
   }
 
@@ -169,6 +178,7 @@ export class CommentResolver {
       input.mentions,
       reply
     );
+    publishCommentChanged(this.realtime, comment.workspaceId, comment.docId);
 
     return {
       ...reply,
@@ -195,6 +205,7 @@ export class CommentResolver {
     await this.assertPermission(me, reply, 'Doc.Comments.Update');
 
     await this.service.updateReply(input);
+    publishCommentChanged(this.realtime, reply.workspaceId, reply.docId);
     return true;
   }
 
@@ -210,6 +221,7 @@ export class CommentResolver {
     await this.assertPermission(me, reply, 'Doc.Comments.Delete');
 
     await this.service.deleteReply(id);
+    publishCommentChanged(this.realtime, reply.workspaceId, reply.docId);
     return true;
   }
 
@@ -289,17 +301,13 @@ export class CommentResolver {
     @CurrentUser() me: UserType,
     @Parent() workspace: WorkspaceType,
     @Args('docId') docId: string,
-    @Args({
-      name: 'pagination',
-    })
+    @Args({ name: 'pagination' })
     pagination: PaginationInput
   ): Promise<PaginatedCommentChangeObjectType> {
+    // DEPRECATED-0.26-COMPAT(realtime): remove after server no longer supports 0.26.x clients.
     await this.assertPermission(
       me,
-      {
-        workspaceId: workspace.id,
-        docId,
-      },
+      { workspaceId: workspace.id, docId },
       'Doc.Comments.Read'
     );
 
@@ -348,10 +356,16 @@ export class CommentResolver {
       'Doc.Comments.Create'
     );
 
-    // TODO(@fengmk2): should check total attachment quota in the future version
     const buffer = await readableToBuffer(attachment.createReadStream());
     // max attachment size is 10MB
     if (buffer.length > 10 * 1024 * 1024) {
+      throw new CommentAttachmentQuotaExceeded();
+    }
+
+    const checkExceeded =
+      await this.quota.getWorkspaceQuotaCalculator(workspaceId);
+    const result = checkExceeded(buffer.length);
+    if (result?.blobQuotaExceeded || result?.storageQuotaExceeded) {
       throw new CommentAttachmentQuotaExceeded();
     }
 
@@ -458,11 +472,7 @@ export class CommentResolver {
 
   private async assertPermission(
     me: UserType,
-    item: {
-      workspaceId: string;
-      docId: string;
-      userId?: string;
-    },
+    item: { workspaceId: string; docId: string; userId?: string },
     action: DocAction
   ) {
     // the owner of the comment/reply can update, delete, resolve it

@@ -13,7 +13,7 @@ import type { SnapshotHistory } from '@prisma/client';
 
 import { CurrentUser } from '../../auth';
 import { PgWorkspaceDocStorageAdapter } from '../../doc';
-import { AccessController } from '../../permission';
+import { PermissionAccess } from '../../permission';
 import { DocID } from '../../utils/doc';
 import { WorkspaceType } from '../types';
 import { EditorType } from './doc';
@@ -37,11 +37,12 @@ class DocHistoryType implements Partial<SnapshotHistory> {
 export class DocHistoryResolver {
   constructor(
     private readonly workspace: PgWorkspaceDocStorageAdapter,
-    private readonly ac: AccessController
+    private readonly ac: PermissionAccess
   ) {}
 
   @ResolveField(() => [DocHistoryType])
   async histories(
+    @CurrentUser() user: CurrentUser,
     @Parent() workspace: WorkspaceType,
     @Args('guid') guid: string,
     @Args({ name: 'before', type: () => GraphQLISODateTime, nullable: true })
@@ -50,6 +51,8 @@ export class DocHistoryResolver {
     take?: number
   ): Promise<DocHistoryType[]> {
     const docId = new DocID(guid, workspace.id);
+
+    await this.ac.user(user.id).doc(docId).assert('Doc.Read');
 
     const histories = await this.workspace.listDocHistories(
       workspace.id,

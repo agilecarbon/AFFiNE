@@ -25,7 +25,7 @@ import {
 } from '../../../base';
 import { Models } from '../../../models';
 import { CurrentUser } from '../../auth';
-import { AccessController, WorkspacePolicyService } from '../../permission';
+import { PermissionAccess } from '../../permission';
 import { QuotaService } from '../../quota';
 import { WorkspaceBlobStorage } from '../../storage';
 import {
@@ -125,8 +125,7 @@ class ListedBlob {
 export class WorkspaceBlobResolver {
   logger = new Logger(WorkspaceBlobResolver.name);
   constructor(
-    private readonly ac: AccessController,
-    private readonly policy: WorkspacePolicyService,
+    private readonly ac: PermissionAccess,
     private readonly quota: QuotaService,
     private readonly storage: WorkspaceBlobStorage,
     private readonly models: Models
@@ -249,11 +248,12 @@ export class WorkspaceBlobResolver {
     }
 
     const metadata = { contentType: mime, contentLength: size };
+    const capabilities = await this.storage.capabilities();
     let init: BlobUploadInit | null = null;
     let uploadIdForRecord: string | null = null;
 
     // try to resume multipart uploads
-    if (record && record.uploadId) {
+    if (capabilities.multipartDirect && record && record.uploadId) {
       const uploadedParts = await this.storage.listMultipartUploadParts(
         workspaceId,
         key,
@@ -271,7 +271,7 @@ export class WorkspaceBlobResolver {
       }
     }
 
-    if (size >= MULTIPART_THRESHOLD) {
+    if (capabilities.multipartDirect && size >= MULTIPART_THRESHOLD) {
       const multipart = await this.storage.createMultipartUpload(
         workspaceId,
         key,
@@ -290,7 +290,7 @@ export class WorkspaceBlobResolver {
       }
     }
 
-    if (!init) {
+    if (!init && capabilities.presignPut) {
       const presigned = await this.storage.presignPut(
         workspaceId,
         key,
@@ -398,6 +398,9 @@ export class WorkspaceBlobResolver {
       if (result.reason === 'mime_mismatch') {
         throw new BlobInvalid('Blob mime mismatch');
       }
+      if (result.reason === 'size_too_large') {
+        throw new BlobInvalid('Blob size too large');
+      }
       throw new BlobInvalid('Blob key mismatch');
     }
 
@@ -467,7 +470,10 @@ export class WorkspaceBlobResolver {
       return false;
     }
 
-    await this.policy.assertCanDeleteBlob(user.id, workspaceId);
+    await this.ac
+      .user(user.id)
+      .workspace(workspaceId)
+      .assert('Workspace.Blobs.Write');
 
     await this.storage.delete(workspaceId, key, permanently);
 
@@ -479,7 +485,10 @@ export class WorkspaceBlobResolver {
     @CurrentUser() user: CurrentUser,
     @Args('workspaceId') workspaceId: string
   ) {
-    await this.policy.assertCanDeleteBlob(user.id, workspaceId);
+    await this.ac
+      .user(user.id)
+      .workspace(workspaceId)
+      .assert('Workspace.Blobs.Write');
 
     await this.storage.release(workspaceId);
 
