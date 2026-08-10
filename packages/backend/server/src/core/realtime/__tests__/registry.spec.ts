@@ -8,9 +8,9 @@ import { z } from 'zod';
 import { CANARY_CLIENT_VERSION_MAX_AGE_DAYS } from '../../../base';
 import { Flavor } from '../../../env';
 import { PublicDocMode } from '../../../models';
-import { CopilotEmbeddingRealtimeProvider } from '../../../plugins/copilot/context';
-import type { CopilotTranscriptionReader } from '../../../plugins/copilot/transcript';
-import { CopilotTranscriptRealtimeProvider } from '../../../plugins/copilot/transcript';
+import { CopilotEmbeddingRealtimeProvider } from '../../../plugins/copilot/embedding/realtime';
+import type { CopilotTranscriptionReader } from '../../../plugins/copilot/transcript/reader';
+import { CopilotTranscriptRealtimeProvider } from '../../../plugins/copilot/transcript/realtime';
 import type { CurrentUser } from '../../auth';
 import { CommentRealtimeProvider } from '../../comment/realtime';
 import { NotificationRealtimeProvider } from '../../notification/realtime';
@@ -445,7 +445,8 @@ test('front and sync realtime gateway required handlers are registered by lightw
   new CopilotTranscriptRealtimeProvider(
     {} as never,
     {} as never,
-    registry
+    registry,
+    {} as never
   ).onModuleInit();
   new QuotaStateRealtimeProvider(
     {} as never,
@@ -968,9 +969,8 @@ test('quota realtime provider exposes effective quota state snapshots', async t 
   );
 });
 
-test('copilot embedding realtime provider uses lightweight model reads', async t => {
+test('copilot embedding realtime provider uses native health and progress', async t => {
   const registry = new RealtimeRegistry();
-  const published: unknown[][] = [];
   const assertions: unknown[] = [];
   const ac = {
     user(userId: string) {
@@ -988,24 +988,17 @@ test('copilot embedding realtime provider uses lightweight model reads', async t
       };
     },
   } as unknown as PermissionAccess;
-  const models = {
-    copilotWorkspace: {
-      checkEmbeddingAvailable: async () => true,
-      getEmbeddingStatus: async () => ({ total: 5, embedded: 3 }),
-    },
-    copilotContext: {
-      getConfig: async () => ({ workspaceId: 'space' }),
-    },
+  const embedding = {
+    health: async () => ({ enabled: true }),
+    progress: async () => ({ total: 5, embedded: 3 }),
   };
-  const publisher = {
-    publish: (...args: unknown[]) => published.push(args),
-  } as unknown as RealtimePublisher;
+  const config = { copilot: { enabled: true } };
 
   const provider = new CopilotEmbeddingRealtimeProvider(
     ac,
-    models as never,
+    embedding as never,
     registry,
-    publisher
+    config as never
   );
   provider.onModuleInit();
 
@@ -1018,23 +1011,21 @@ test('copilot embedding realtime provider uses lightweight model reads', async t
       embedded: 3,
     }
   );
+  config.copilot.enabled = false;
+  await t.throwsAsync(
+    registry
+      .getRequest('workspace.embedding.progress.get')
+      .handle(user, { workspaceId: 'space' }),
+    { message: 'Copilot is disabled.' }
+  );
   t.is(
     registry
       .getTopic('workspace.embedding.progress.changed')
       .room(user, { workspaceId: 'space' }),
     realtimeWorkspaceEmbeddingProgressRoom('space')
   );
-
-  await provider.onDocEmbedFinished({ contextId: 'context', docId: 'doc' });
-
   t.deepEqual(assertions, [
     { userId: 'u1', workspaceId: 'space', action: 'Workspace.Copilot' },
-  ]);
-  t.deepEqual(published[0], [
-    'workspace.embedding.progress.changed',
-    { workspaceId: 'space' },
-    { reason: 'finished' },
-    { room: realtimeWorkspaceEmbeddingProgressRoom('space') },
   ]);
 });
 
@@ -1068,11 +1059,9 @@ test('copilot transcript realtime provider registers task live query handlers', 
     },
   } as unknown as CopilotTranscriptionReader;
 
-  new CopilotTranscriptRealtimeProvider(
-    ac,
-    transcript,
-    registry
-  ).onModuleInit();
+  new CopilotTranscriptRealtimeProvider(ac, transcript, registry, {
+    copilot: { enabled: true },
+  } as never).onModuleInit();
 
   t.deepEqual(
     await registry.getRequest('copilot.transcript.task.get').handle(user, {
