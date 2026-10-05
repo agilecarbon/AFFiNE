@@ -1,7 +1,7 @@
 import { DomRenderer } from '@blocksuite/affine-block-surface';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { wait } from '../utils/common.js';
+import { wait, waitForCondition } from '../utils/common.js';
 import { getSurface } from '../utils/edgeless.js';
 import { setupEditor } from '../utils/setup.js';
 
@@ -40,11 +40,15 @@ describe('Shape rendering with DOM renderer', () => {
     };
     const shapeId = surfaceModel.addElement(shapeProps);
 
-    await new Promise(resolve => setTimeout(resolve, 100));
-    const shapeElement = surfaceView?.renderRoot.querySelector(
-      `[data-element-id="${shapeId}"]`
+    const queryShapeElement = () =>
+      surfaceView?.renderRoot.querySelector(`[data-element-id="${shapeId}"]`);
+
+    await waitForCondition(
+      () => queryShapeElement() !== null,
+      { timeout: 2000, message: 'Shape DOM node was not rendered' }
     );
 
+    const shapeElement = queryShapeElement();
     expect(shapeElement).not.toBeNull();
     expect(shapeElement).toBeInstanceOf(HTMLElement);
   });
@@ -61,8 +65,16 @@ describe('Shape rendering with DOM renderer', () => {
       stroke: '#000000',
     };
     const shapeId = surfaceModel.addElement(shapeProps);
-    await wait(100);
-    const shapeElement = surfaceView?.renderRoot.querySelector<HTMLElement>(
+
+    await waitForCondition(
+      () =>
+        surfaceView.renderRoot.querySelector<HTMLElement>(
+          `[data-element-id="${shapeId}"]`
+        ) !== null,
+      { timeout: 2000, message: 'Shape DOM node was not rendered' }
+    );
+
+    const shapeElement = surfaceView.renderRoot.querySelector<HTMLElement>(
       `[data-element-id="${shapeId}"]`
     );
 
@@ -84,21 +96,24 @@ describe('Shape rendering with DOM renderer', () => {
     };
     const shapeId = surfaceModel.addElement(shapeProps);
 
-    await new Promise(resolve => setTimeout(resolve, 100));
+    await wait(100);
 
-    let shapeElement = surfaceView.renderRoot.querySelector(
-      `[data-element-id="${shapeId}"]`
-    );
-    expect(shapeElement).not.toBeNull();
+    const queryShapeElement = () =>
+      surfaceView.renderRoot.querySelector(`[data-element-id="${shapeId}"]`);
+
+    expect(queryShapeElement()).not.toBeNull();
 
     surfaceModel.deleteElement(shapeId);
 
-    await new Promise(resolve => setTimeout(resolve, 100));
-
-    shapeElement = surfaceView.renderRoot.querySelector(
-      `[data-element-id="${shapeId}"]`
+    await waitForCondition(
+      () => queryShapeElement() === null,
+      {
+        timeout: 2000,
+        message: 'Shape DOM node still exists after delete',
+      }
     );
-    expect(shapeElement).toBeNull();
+
+    expect(queryShapeElement()).toBeNull();
   });
 
   test('should correctly render diamond shape', async () => {
@@ -113,8 +128,16 @@ describe('Shape rendering with DOM renderer', () => {
       filled: true,
     };
     const shapeId = surfaceModel.addElement(shapeProps);
-    await wait(100);
-    const shapeElement = surfaceView?.renderRoot.querySelector<HTMLElement>(
+
+    await waitForCondition(
+      () =>
+        surfaceView.renderRoot.querySelector<HTMLElement>(
+          `[data-element-id="${shapeId}"]`
+        ) !== null,
+      { timeout: 2000, message: 'Diamond DOM node was not rendered' }
+    );
+
+    const shapeElement = surfaceView.renderRoot.querySelector<HTMLElement>(
       `[data-element-id="${shapeId}"]`
     );
 
@@ -136,8 +159,16 @@ describe('Shape rendering with DOM renderer', () => {
       filled: true,
     };
     const shapeId = surfaceModel.addElement(shapeProps);
-    await wait(100);
-    const shapeElement = surfaceView?.renderRoot.querySelector<HTMLElement>(
+
+    await waitForCondition(
+      () =>
+        surfaceView.renderRoot.querySelector<HTMLElement>(
+          `[data-element-id="${shapeId}"]`
+        ) !== null,
+      { timeout: 2000, message: 'Triangle DOM node was not rendered' }
+    );
+
+    const shapeElement = surfaceView.renderRoot.querySelector<HTMLElement>(
       `[data-element-id="${shapeId}"]`
     );
 

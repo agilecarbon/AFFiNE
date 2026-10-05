@@ -16,16 +16,37 @@ import {
   CODE_BLOCK_DEFAULT_LIGHT_THEME,
 } from './highlight/const.js';
 
+type WorkerHighlighterState = {
+  highlighter: HighlighterCore | null;
+  promise: Promise<HighlighterCore> | null;
+};
+
+const workerHighlighterState: WorkerHighlighterState = {
+  highlighter: null,
+  promise: null,
+};
+
+const getWorkerScopedHighlighter = async (): Promise<HighlighterCore> => {
+  if (workerHighlighterState.highlighter) {
+    return workerHighlighterState.highlighter;
+  }
+  if (!workerHighlighterState.promise) {
+    workerHighlighterState.promise = createHighlighterCore({
+      engine: createOnigurumaEngine(() => getWasm),
+    }).then(highlighter => {
+      workerHighlighterState.highlighter = highlighter;
+      return highlighter;
+    });
+  }
+  return workerHighlighterState.promise;
+};
+
 export class CodeBlockHighlighter extends LifeCycleWatcher {
   static override key = 'code-block-highlighter';
 
-  // Singleton highlighter instance
-  private static _sharedHighlighter: HighlighterCore | null = null;
-  private static _highlighterPromise: Promise<HighlighterCore> | null = null;
-  private static _refCount = 0;
-
   private _darkThemeKey: string | undefined;
   private _lightThemeKey: string | undefined;
+  private _isMounted = false;
 
   highlighter$: Signal<HighlighterCore | null> = signal(null);
 
@@ -39,10 +60,7 @@ export class CodeBlockHighlighter extends LifeCycleWatcher {
   private readonly _loadTheme = async (
     highlighter: HighlighterCore
   ): Promise<void> => {
-    // It is possible that by the time the highlighter is ready all instances
-    // have already been unmounted. In that case there is no need to load
-    // themes or update state.
-    if (CodeBlockHighlighter._refCount === 0) {
+    if (!this._isMounted) {
       return;
     }
 
@@ -52,61 +70,26 @@ export class CodeBlockHighlighter extends LifeCycleWatcher {
     this._darkThemeKey = (await normalizeGetter(darkTheme)).name;
     this._lightThemeKey = (await normalizeGetter(lightTheme)).name;
     await highlighter.loadTheme(darkTheme, lightTheme);
-    this.highlighter$.value = highlighter;
+    if (this._isMounted) {
+      this.highlighter$.value = highlighter;
+    }
   };
-
-  private static async _getOrCreateHighlighter(): Promise<HighlighterCore> {
-    if (CodeBlockHighlighter._sharedHighlighter) {
-      return CodeBlockHighlighter._sharedHighlighter;
-    }
-
-    if (!CodeBlockHighlighter._highlighterPromise) {
-      CodeBlockHighlighter._highlighterPromise = createHighlighterCore({
-        engine: createOnigurumaEngine(() => getWasm),
-      }).then(highlighter => {
-        CodeBlockHighlighter._sharedHighlighter = highlighter;
-        return highlighter;
-      });
-    }
-
-    return CodeBlockHighlighter._highlighterPromise;
-  }
 
   override mounted(): void {
     super.mounted();
 
-    CodeBlockHighlighter._refCount++;
+    this._isMounted = true;
 
-    CodeBlockHighlighter._getOrCreateHighlighter()
+    getWorkerScopedHighlighter()
       .then(this._loadTheme)
       .catch(console.error);
   }
 
   override unmounted(): void {
-    CodeBlockHighlighter._refCount--;
+    this._isMounted = false;
+    this.highlighter$.value = null;
 
-    // Dispose the shared highlighter **after** any in-flight creation finishes.
-    if (CodeBlockHighlighter._refCount !== 0) {
-      return;
-    }
-
-    const doDispose = (highlighter: HighlighterCore | null) => {
-      if (highlighter) {
-        highlighter.dispose();
-      }
-      CodeBlockHighlighter._sharedHighlighter = null;
-      CodeBlockHighlighter._highlighterPromise = null;
-    };
-
-    if (CodeBlockHighlighter._sharedHighlighter) {
-      // Highlighter already created – dispose immediately.
-      doDispose(CodeBlockHighlighter._sharedHighlighter);
-    } else if (CodeBlockHighlighter._highlighterPromise) {
-      // Highlighter still being created – wait for it, then dispose.
-      CodeBlockHighlighter._highlighterPromise
-        .then(doDispose)
-        .catch(console.error);
-    }
+    super.unmounted();
   }
 }
 

@@ -4,7 +4,7 @@ import { Bound } from '@blocksuite/global/gfx';
 import type { GfxController } from '@blocksuite/std/gfx';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { click, pointermove, wait } from '../utils/common.js';
+import { click, pointermove, wait, waitForCondition } from '../utils/common.js';
 import { getDocRootBlock } from '../utils/edgeless.js';
 import { setupEditor } from '../utils/setup.js';
 
@@ -284,16 +284,26 @@ describe('mindmap', () => {
       await wait(500);
 
       // child button should be hidden
-      expect(childButton.hidden).toBe(true);
-      expect(childButton.opacity).toBe(0);
+      await waitForCondition(
+        () => childButton.hidden === true && childButton.opacity === 0,
+        {
+          timeout: 2000,
+          message: 'Child collapse button should hide when parent is collapsed',
+        }
+      );
 
       // expand root node
       doc.undo();
       await wait();
 
       // child button should be visible
-      expect(childButton.hidden).toBe(false);
-      expect(childButton.opacity).toBe(1);
+      await waitForCondition(
+        () => childButton.hidden === false && childButton.opacity === 1,
+        {
+          timeout: 2000,
+          message: 'Child collapse button should reappear after parent expands',
+        }
+      );
 
       // child nodes should still be collapsed
       expect(mindmap().getNodeByPath([0, 2])!.detail.collapsed).toBe(true);

@@ -1203,12 +1203,18 @@ describe('notion html to snapshot', () => {
       'https://raw.githubusercontent.com/toeverything/blocksuite/master/assets/logo.svg';
 
     const imageProxy = DEFAULT_IMAGE_PROXY_ENDPOINT;
-    const imageUrl = `${imageProxy}?url=${encodeURIComponent(originalUrl)}`;
 
     // Mock the image request
     const imageRequestHandlers = [
-      http.get(imageUrl.toString(), async () => {
-        // Return a mock image blob
+      http.get(imageProxy, async ({ request }) => {
+        const requestedUrl = new URL(request.url).searchParams.get('url');
+        if (!requestedUrl || requestedUrl !== originalUrl) {
+          return HttpResponse.json(
+            { error: 'unexpected image proxy url' },
+            { status: 400 }
+          );
+        }
+
         const mockImageBlob = new Blob(['mock image data'], {
           type: 'image/svg+xml',
         });

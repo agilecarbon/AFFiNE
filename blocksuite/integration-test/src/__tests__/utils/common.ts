@@ -2,10 +2,41 @@ import type { Point } from '@blocksuite/global/gfx';
 
 export function wait(time: number = 0) {
   return new Promise(resolve => {
-    requestAnimationFrame(() => {
+    let settled = false;
+    const finish = () => {
+      if (settled) {
+        return;
+      }
+      settled = true;
       setTimeout(resolve, time);
-    });
+    };
+
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(finish);
+    }
+
+    // WebKit throttles requestAnimationFrame aggressively for background tabs.
+    // Fallback to a regular timer so tests don’t hang waiting for a frame that never fires.
+    setTimeout(finish, 16);
   });
+}
+
+export async function waitForCondition(
+  predicate: () => boolean,
+  {
+    timeout = 1000,
+    interval = 16,
+    message,
+  }: { timeout?: number; interval?: number; message?: string } = {}
+) {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    if (predicate()) {
+      return;
+    }
+    await wait(interval);
+  }
+  throw new Error(message ?? 'waitForCondition timed out');
 }
 
 /**

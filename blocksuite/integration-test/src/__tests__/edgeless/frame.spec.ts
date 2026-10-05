@@ -6,7 +6,7 @@ import { assertType } from '@blocksuite/global/utils';
 import { Text } from '@blocksuite/store';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { wait } from '../utils/common.js';
+import { wait, waitForCondition } from '../utils/common.js';
 import { getDocRootBlock } from '../utils/edgeless.js';
 import { setupEditor } from '../utils/setup.js';
 
@@ -39,11 +39,17 @@ describe('frame', () => {
       return frameTitleWidget?.shadowRoot?.querySelector('affine-frame-title');
     };
 
-    const frameTitle = getFrameTitle(frame);
-    const rect = frameTitle?.getBoundingClientRect();
+    await waitForCondition(
+      () => Boolean(getFrameTitle(frame)),
+      {
+        timeout: 2000,
+        message: 'Frame title widget was not rendered',
+      }
+    );
 
-    expect(frameTitle).toBeTruthy();
-    expect(rect).toBeTruthy();
+    const frameTitle = getFrameTitle(frame)!;
+    const rect = frameTitle.getBoundingClientRect();
+
     expect(rect!.width).toBeGreaterThan(0);
     expect(rect!.height).toBeGreaterThan(0);
 
@@ -64,9 +70,15 @@ describe('frame', () => {
     );
     await wait();
 
-    const nestedTitle = getFrameTitle(nestedFrame);
-    expect(nestedTitle).toBeTruthy();
-    if (!nestedTitle) return;
+    await waitForCondition(
+      () => Boolean(getFrameTitle(nestedFrame)),
+      {
+        timeout: 2000,
+        message: 'Nested frame title widget was not rendered',
+      }
+    );
+
+    const nestedTitle = getFrameTitle(nestedFrame)!;
 
     const nestedTitleRect = nestedTitle.getBoundingClientRect()!;
     const [nestedTitleX, nestedTitleY] =
@@ -96,6 +108,15 @@ describe('frame', () => {
     assertType<FrameBlockComponent>(frame);
 
     service.viewport.setCenter(900, 900);
+
+    await waitForCondition(
+      () => frame?.model.externalXYWH !== undefined,
+      {
+        timeout: 2000,
+        message: 'Frame externalXYWH not computed after viewport move',
+      }
+    );
+
     expect(frame?.model.externalXYWH).toBeDefined();
   });
 

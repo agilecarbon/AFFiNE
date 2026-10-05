@@ -4,13 +4,18 @@ import { Injectable } from '@nestjs/common';
 import { WorkspaceFolder } from '@prisma/client';
 
 import { BadRequest, NotFound } from '../base/error';
+import { migrateLegacyFolderSnapshot } from '../core/workspaces/legacy-folder-migration';
 import { BaseModel } from './base';
 
 export type WorkspaceFolderNodeType = 'folder' | 'doc' | 'tag' | 'collection';
 
 @Injectable()
 export class WorkspaceFolderModel extends BaseModel {
+  private migratedWorkspaces = new Set<string>();
+  private migrationPromises = new Map<string, Promise<void>>();
+
   async list(workspaceId: string, parentId: string | null) {
+    await this.ensureLegacyFolders(workspaceId);
     return await this.db.workspaceFolder.findMany({
       where: {
         workspaceId,
@@ -23,6 +28,7 @@ export class WorkspaceFolderModel extends BaseModel {
   }
 
   async listAll(workspaceId: string) {
+    await this.ensureLegacyFolders(workspaceId);
     return await this.db.workspaceFolder.findMany({
       where: {
         workspaceId,
@@ -34,6 +40,7 @@ export class WorkspaceFolderModel extends BaseModel {
   }
 
   async get(workspaceId: string, id: string) {
+    await this.ensureLegacyFolders(workspaceId);
     return await this.db.workspaceFolder.findUnique({
       where: {
         workspaceId_id: {
@@ -69,6 +76,7 @@ export class WorkspaceFolderModel extends BaseModel {
     name: string,
     index: string
   ) {
+    await this.ensureLegacyFolders(workspaceId);
     if (parentId) {
       await this.assertParent(workspaceId, parentId);
     }
@@ -92,6 +100,7 @@ export class WorkspaceFolderModel extends BaseModel {
     targetId: string,
     index: string
   ) {
+    await this.ensureLegacyFolders(workspaceId);
     if (!parentId) {
       throw new BadRequest('Links must have a parent folder');
     }
@@ -110,6 +119,7 @@ export class WorkspaceFolderModel extends BaseModel {
   }
 
   async rename(workspaceId: string, id: string, name: string) {
+    await this.ensureLegacyFolders(workspaceId);
     const node = await this.assertNode(workspaceId, id);
     if (node.type !== 'folder') {
       throw new BadRequest('Only folder nodes can be renamed');
@@ -159,6 +169,7 @@ export class WorkspaceFolderModel extends BaseModel {
     parentId: string | null,
     index: string
   ) {
+    await this.ensureLegacyFolders(workspaceId);
     const node = await this.assertNode(workspaceId, id);
     if (!parentId && node.type !== 'folder') {
       throw new BadRequest('Only folders can be moved to the root');
@@ -184,6 +195,7 @@ export class WorkspaceFolderModel extends BaseModel {
   }
 
   async delete(workspaceId: string, id: string) {
+    await this.ensureLegacyFolders(workspaceId);
     await this.assertNode(workspaceId, id);
     const queue: string[] = [id];
     const targets: string[] = [];
@@ -209,5 +221,33 @@ export class WorkspaceFolderModel extends BaseModel {
         },
       },
     });
+  }
+
+  private ensureLegacyFolders(workspaceId: string): Promise<void> {
+    if (this.migratedWorkspaces.has(workspaceId)) {
+      return Promise.resolve();
+    }
+
+    const inFlight = this.migrationPromises.get(workspaceId);
+    if (inFlight) {
+      return inFlight;
+    }
+
+    const task = migrateLegacyFolderSnapshot(this.db, workspaceId)
+      .then(() => {
+        this.migratedWorkspaces.add(workspaceId);
+      })
+      .catch(error => {
+        this.logger.warn(
+          `Failed to migrate legacy folders for workspace ${workspaceId}: ${error instanceof Error ? error.message : String(error)}`
+        );
+        throw error;
+      })
+      .finally(() => {
+        this.migrationPromises.delete(workspaceId);
+      });
+
+    this.migrationPromises.set(workspaceId, task);
+    return task;
   }
 }

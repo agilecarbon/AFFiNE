@@ -1,5 +1,11 @@
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import { defineConfig } from 'vitest/config';
+
+const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
+const blockSuiteSetup = resolve(repoRoot, 'blocksuite/scripts/setup/test-env.ts');
 
 export default defineConfig({
   esbuild: {
@@ -8,6 +14,7 @@ export default defineConfig({
   plugins: [vanillaExtractPlugin()],
   test: {
     globalSetup: '../../../scripts/vitest-global.js',
+    setupFiles: [blockSuiteSetup],
     include: ['src/__tests__/**/*.unit.spec.ts'],
     testTimeout: 1000,
     coverage: {

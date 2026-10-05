@@ -5,7 +5,7 @@ import {
 import type { DocSnapshot } from '@blocksuite/store';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { wait } from '../utils/common.js';
+import { wait, waitForCondition } from '../utils/common.js';
 import { addNote, getDocRootBlock } from '../utils/edgeless.js';
 import { importFromSnapshot } from '../utils/misc.js';
 import { setupEditor } from '../utils/setup.js';
@@ -65,6 +65,19 @@ describe('basic', () => {
 
     editor.mode = 'page';
     await wait();
+
+    await waitForCondition(
+      () =>
+        Boolean(
+          document.querySelector(
+            `affine-surface-ref[data-block-id="${surfaceRefId}"]`
+          )
+        ),
+      {
+        timeout: 2000,
+        message: 'Surface ref failed to appear in page mode',
+      }
+    );
 
     expect(
       document.querySelector(

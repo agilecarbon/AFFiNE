@@ -1,7 +1,7 @@
 import { DomRenderer } from '@blocksuite/affine-block-surface';
 import { beforeEach, describe, expect, test } from 'vitest';
 
-import { wait } from '../utils/common.js';
+import { wait, waitForCondition } from '../utils/common.js';
 import { getSurface } from '../utils/edgeless.js';
 import { setupEditor } from '../utils/setup.js';
 
@@ -141,18 +141,21 @@ describe('Connector rendering with DOM renderer', () => {
 
     await wait(100);
 
-    let connectorElement = surfaceView.renderRoot.querySelector(
-      `[data-element-id="${connectorId}"]`
-    );
-    expect(connectorElement).not.toBeNull();
+    const queryConnector = () =>
+      surfaceView.renderRoot.querySelector(`[data-element-id="${connectorId}"]`);
+
+    expect(queryConnector()).not.toBeNull();
 
     surfaceModel.deleteElement(connectorId);
 
-    await wait(100);
-
-    connectorElement = surfaceView.renderRoot.querySelector(
-      `[data-element-id="${connectorId}"]`
+    await waitForCondition(
+      () => queryConnector() === null,
+      {
+        timeout: 2000,
+        message: 'Connector DOM node still exists after delete',
+      }
     );
-    expect(connectorElement).toBeNull();
+
+    expect(queryConnector()).toBeNull();
   });
 });
